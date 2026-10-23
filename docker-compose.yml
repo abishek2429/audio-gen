@@ -2,7 +2,76 @@ version: "3.8"
 
 services:
   # ============================================================================
-  # 1. FastAPI Gateway
+  # 1. PostgreSQL Database
+  # ============================================================================
+  db:
+    image: postgres:16-alpine
+    container_name: incubrix_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-incubrix}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - incubrix_net
+
+  # ============================================================================
+  # 2. Redis Message Broker & State Cache
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: incubrix_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    networks:
+      - incubrix_net
+
+  # ============================================================================
+  # 3. MinIO S3-Compatible Object Storage
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: incubrix_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - incubrix_net
+
+  # ============================================================================
+  # 4. FastAPI Audio Engine Gateway
   # ============================================================================
   api:
     build:
@@ -11,12 +80,10 @@ services:
     container_name: incubrix_api
     restart: unless-stopped
     command: >
-      sh -c "alembic upgrade head &&
+      sh -c "alembic upgrade head || python -c 'from src.database.session import init_db; init_db()' &&
              uvicorn src.main:app --host 0.0.0.0 --port 8000"
     ports:
-      - "8000:8000"
-    env_file:
-      - .env
+      - "${API_PORT:-8000}:8000"
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/incubrix
       - REDIS_URL=redis://redis:6379/0
@@ -24,11 +91,26 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CELERY_ENABLED=true
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-      - MINIO_BUCKET=incubrix-audio
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - MINIO_BUCKET=${MINIO_BUCKET:-incubrix-audio}
+      - MINIO_SECURE=false
       - STORAGE_BACKEND=minio
-      - MUSIC_PROVIDER=mock
+      - MUSIC_PROVIDER=${MUSIC_PROVIDER:-mock}
+      - SOUNDVERSE_API_KEY=${SOUNDVERSE_API_KEY:-}
+      - SOUNDVERSE_BASE_URL=${SOUNDVERSE_BASE_URL:-https://apiv2.soundverse.ai}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - ELEVENLABS_BASE_URL=${ELEVENLABS_BASE_URL:-https://api.elevenlabs.io}
+      - DEMO_API_KEY=${DEMO_API_KEY:-}
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60}
+      - MAX_UPLOAD_SIZE_BYTES=${MAX_UPLOAD_SIZE_BYTES:-52428800}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       db:
         condition: service_healthy
@@ -36,11 +118,16 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
     networks:
       - incubrix_net
 
   # ============================================================================
-  # 2. Celery Audio Processing Worker
+  # 5. Celery Asynchronous Audio Worker
   # ============================================================================
   worker:
     build:
@@ -49,8 +136,6 @@ services:
     container_name: incubrix_worker
     restart: unless-stopped
     command: celery -A src.tasks.celery_app worker --loglevel=info --concurrency=2
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/incubrix
       - REDIS_URL=redis://redis:6379/0
@@ -58,11 +143,17 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CELERY_ENABLED=true
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-      - MINIO_BUCKET=incubrix-audio
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - MINIO_BUCKET=${MINIO_BUCKET:-incubrix-audio}
+      - MINIO_SECURE=false
       - STORAGE_BACKEND=minio
-      - MUSIC_PROVIDER=mock
+      - MUSIC_PROVIDER=${MUSIC_PROVIDER:-mock}
+      - SOUNDVERSE_API_KEY=${SOUNDVERSE_API_KEY:-}
+      - SOUNDVERSE_BASE_URL=${SOUNDVERSE_BASE_URL:-https://apiv2.soundverse.ai}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - ELEVENLABS_BASE_URL=${ELEVENLABS_BASE_URL:-https://api.elevenlabs.io}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     depends_on:
       db:
         condition: service_healthy
@@ -70,76 +161,49 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4096M
     networks:
       - incubrix_net
 
   # ============================================================================
-  # 3. PostgreSQL Database
+  # 6. React + TypeScript Web Dashboard (Audio Studio)
   # ============================================================================
-  db:
-    image: postgres:16-alpine
-    container_name: incubrix_postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: incubrix
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - incubrix_net
-
-  # ============================================================================
-  # 4. Redis Task Broker & Cache
-  # ============================================================================
-  redis:
-    image: redis:7-alpine
-    container_name: incubrix_redis
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: incubrix_frontend
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${FRONTEND_PORT:-3000}:80"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost/"]
+      interval: 10s
       timeout: 5s
-      retries: 5
-    networks:
-      - incubrix_net
-
-  # ============================================================================
-  # 5. MinIO S3-Compatible Object Storage
-  # ============================================================================
-  minio:
-    image: minio/minio:latest
-    container_name: incubrix_minio
-    restart: unless-stopped
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - miniodata:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      retries: 3
+      start_period: 5s
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
     networks:
       - incubrix_net
 
 volumes:
   pgdata:
+  redisdata:
   miniodata:
+  storagedata:
 
 networks:
   incubrix_net:

@@ -190,3 +190,55 @@ def send_signed_callback(
     except Exception as e:
         logger.error("Callback delivery to '%s' failed: %s", callback_url, e)
         return False
+
+
+class InMemoryRateLimiter:
+    """Sliding-window in-memory rate limiter tracking requests per client key."""
+
+    def __init__(self, limit_per_minute: int = 60):
+        import threading
+        self.limit_per_minute = limit_per_minute
+        self._requests: Dict[str, list] = {}
+        self._lock = threading.Lock()
+
+    def is_allowed(self, client_id: str, limit: Optional[int] = None) -> bool:
+        """Check if client request is within allowed rate threshold."""
+        import time
+        max_limit = limit if limit is not None else self.limit_per_minute
+        if max_limit <= 0:
+            return True
+
+        now = time.time()
+        window_start = now - 60.0
+
+        with self._lock:
+            history = self._requests.get(client_id, [])
+            # Prune timestamps older than 60 seconds
+            history = [t for t in history if t > window_start]
+            if len(history) >= max_limit:
+                self._requests[client_id] = history
+                return False
+            history.append(now)
+            self._requests[client_id] = history
+            return True
+
+    def reset(self):
+        """Clear all tracked request histories."""
+        with self._lock:
+            self._requests.clear()
+
+
+global_rate_limiter = InMemoryRateLimiter()
+
+
+def validate_demo_api_key(
+    provided_key: Optional[str],
+    configured_key: Optional[str],
+) -> bool:
+    """Verify demo API key using constant-time comparison."""
+    if not configured_key or not configured_key.strip():
+        # Demo protection not configured, permit request
+        return True
+    if not provided_key:
+        return False
+    return hmac.compare_digest(provided_key.strip(), configured_key.strip())

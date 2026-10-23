@@ -59,6 +59,69 @@ def create_app() -> FastAPI:
         cid = request.headers.get("X-Correlation-Id") or f"corr_{uuid.uuid4().hex[:12]}"
         correlation_id_ctx.set(cid)
 
+        # 1. Request payload size check
+        cl = request.headers.get("content-length")
+        if cl:
+            try:
+                if int(cl) > settings.max_upload_size_bytes:
+                    return JSONResponse(
+                        status_code=getattr(status, "HTTP_413_CONTENT_TOO_LARGE", 413),
+                        content={
+                            "error": {
+                                "code": "PAYLOAD_TOO_LARGE",
+                                "message": f"Request body exceeds maximum allowed size of {settings.max_upload_size_bytes} bytes.",
+                                "retryable": False,
+                                "details": {"max_bytes": settings.max_upload_size_bytes, "received_bytes": int(cl)},
+                            }
+                        },
+                    )
+            except ValueError:
+                pass
+
+        # 2. Demo access protection (when DEMO_API_KEY is configured)
+        public_paths = {"/health", "/ready", "/docs", "/openapi.json", "/redoc"}
+        path = request.url.path
+        if settings.demo_api_key and settings.demo_api_key.strip():
+            if path not in public_paths and not path.startswith("/docs"):
+                auth_hdr = request.headers.get("Authorization", "")
+                bearer_tok = auth_hdr[7:].strip() if auth_hdr.startswith("Bearer ") else None
+                provided_key = request.headers.get("X-API-Key") or bearer_tok
+                from src.security import validate_demo_api_key
+                if not validate_demo_api_key(provided_key, settings.demo_api_key):
+                    return JSONResponse(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        content={
+                            "error": {
+                                "code": "UNAUTHORIZED",
+                                "message": "Demo authentication required. Provide valid API key in 'X-API-Key' or 'Authorization: Bearer <key>'.",
+                                "retryable": False,
+                                "details": {},
+                            }
+                        },
+                    )
+
+        # 3. Rate limiting (sliding window per client IP)
+        if settings.rate_limit_per_minute > 0 and path not in public_paths:
+            client_ip = (
+                request.headers.get("X-Forwarded-For", request.client.host if request.client else "127.0.0.1")
+                .split(",")[0]
+                .strip()
+            )
+            from src.security import global_rate_limiter
+            if not global_rate_limiter.is_allowed(client_ip, limit=settings.rate_limit_per_minute):
+                return JSONResponse(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    content={
+                        "error": {
+                            "code": "RATE_LIMIT_EXCEEDED",
+                            "message": f"Rate limit of {settings.rate_limit_per_minute} requests per minute exceeded.",
+                            "retryable": True,
+                            "details": {"retry_after_s": 60},
+                        }
+                    },
+                    headers={"Retry-After": "60"},
+                )
+
         response = await call_next(request)
         response.headers["X-Correlation-Id"] = cid
         return response
