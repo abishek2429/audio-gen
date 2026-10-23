@@ -17,7 +17,31 @@ class Settings(BaseSettings):
     elevenlabs_api_key: Optional[str] = None
     elevenlabs_base_url: str = "https://api.elevenlabs.io"
 
-    # DSP & Audio Engineering Standards
+    # Database Settings (PostgreSQL in container, SQLite locally)
+    database_url: str = "sqlite:///./incubrix.db"
+
+    # Redis and Celery Settings
+    redis_url: str = "redis://localhost:6379/0"
+    celery_broker_url: str = "redis://localhost:6379/0"
+    celery_result_backend: str = "redis://localhost:6379/0"
+    celery_enabled: bool = False
+
+    # MinIO / Object Storage Settings
+    storage_backend: Literal["minio", "local"] = "local"
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "minioadmin"
+    minio_secret_key: str = "minioadmin"
+    minio_bucket: str = "incubrix-audio"
+    minio_secure: bool = False
+    local_storage_dir: str = "./storage_data"
+
+    # Security & Webhook Callback Settings
+    callback_secret: str = "incubrix-default-hmac-secret-change-in-prod"
+    max_upload_size_bytes: int = 52428800  # 50 MB
+    demo_api_key: Optional[str] = None  # Optional API token for live demo protection
+    rate_limit_per_minute: int = 60
+
+    # DSP & Audio Engineering Standards (ITU-R BS.1770-4)
     default_sample_rate: int = 48000
     target_lufs: float = -16.0
     target_true_peak_dbtp: float = -1.0

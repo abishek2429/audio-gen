@@ -1,18 +1,18 @@
-"""Data models and schemas for IncuBrix AI Background Music Engine."""
+"""Data models and OpenAPI 3.1 schemas for IncuBrix AI Background Music Engine."""
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 
 
 class SectionPlan(BaseModel):
-    """Mood change section at a specific edit point."""
+    """Mood change section at a specific video cut point."""
     start_s: float = Field(..., ge=0.0, description="Start time in seconds")
-    mood: str = Field(..., description="Mood or instrumentation instruction for this section")
+    mood: str = Field(..., min_length=1, description="Mood or instrumentation instruction for this section")
 
 
 class OutputConfig(BaseModel):
     """Audio rendering and format settings."""
-    sample_rate: int = Field(default=48000, description="Target sample rate in Hz")
-    target_lufs: float = Field(default=-16.0, description="Target integrated loudness in LUFS")
+    sample_rate: int = Field(default=48000, description="Target sample rate in Hz (default: 48000)")
+    target_lufs: float = Field(default=-16.0, description="Target integrated loudness in LUFS (default: -16.0)")
     formats: List[str] = Field(default_factory=lambda: ["wav", "mp3"], description="Output container formats")
 
 
@@ -25,8 +25,53 @@ class MusicJobRequest(BaseModel):
     key: Optional[str] = Field(default=None, description="Optional musical key (e.g., 'C major', 'A minor')")
     loopable: bool = Field(default=False, description="Whether audio must loop seamlessly")
     narration_url: Optional[str] = Field(default=None, description="Optional URL to voiceover audio for auto-ducking")
+    callback_url: Optional[str] = Field(default=None, description="Optional webhook URL to receive HMAC-signed job completion")
     seed: Optional[int] = Field(default=None, description="Optional random seed for reproducible synthesis")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output audio configuration")
+
+
+class JobAcceptedResponse(BaseModel):
+    """HTTP 202 Accepted response returned on job creation."""
+    job_id: str = Field(..., description="Unique job identifier")
+    status: str = Field(default="queued", description="Initial job status ('queued')")
+    progress: int = Field(default=0, ge=0, le=100, description="Job progress percentage (0-100)")
+    created_at: str = Field(..., description="ISO 8601 creation timestamp")
+    message: str = Field(default="Job accepted and queued for processing", description="Human-readable status message")
+
+
+class JobResultURLs(BaseModel):
+    """Download links to finished audio assets."""
+    mix_wav: str = Field(..., description="Direct download URL for finished 48kHz mix.wav")
+    mix_mp3: Optional[str] = Field(default=None, description="Download URL for finished mix.mp3")
+    mix_ducked_wav: Optional[str] = Field(default=None, description="Download URL for narration-ducked mix.wav")
+    stems: Dict[str, str] = Field(default_factory=dict, description="Download URLs for individual instrument stems")
+    manifest: str = Field(..., description="Download URL for music_manifest.json")
+    validation_report: Optional[str] = Field(default=None, description="Download URL for validation_report.json")
+
+
+class ErrorDetail(BaseModel):
+    """Standardized error structure per Integration Standard Point 5."""
+    code: str = Field(..., description="UPPER_SNAKE_CASE error code")
+    message: str = Field(..., description="Descriptive error message")
+    retryable: bool = Field(default=False, description="Whether the request can be safely retried")
+    details: Dict[str, Any] = Field(default_factory=dict, description="Additional context or validation details")
+
+
+class StandardErrorResponse(BaseModel):
+    """Root error response schema."""
+    error: ErrorDetail
+
+
+class JobStatusResponse(BaseModel):
+    """Detailed job status returned by GET /api/v1/jobs/{job_id}."""
+    job_id: str
+    status: str = Field(..., description="Status: 'queued', 'running', 'succeeded', 'failed'")
+    progress: int = Field(..., ge=0, le=100, description="Progress from 0 to 100")
+    result: Optional[JobResultURLs] = None
+    manifest: Optional[Dict[str, Any]] = None
+    error: Optional[ErrorDetail] = None
+    created_at: str
+    updated_at: str
 
 
 class MusicManifest(BaseModel):
