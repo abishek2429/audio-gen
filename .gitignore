@@ -22,3 +22,4 @@ htmlcov/
 
 # Heavy audio binary artifacts (keep metadata/manifests/reports)
 artifacts/**/*.wav
+artifacts/**/*.mp3

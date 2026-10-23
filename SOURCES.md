@@ -49,11 +49,20 @@ This document provides full disclosure of every external API service, software l
 | **SciPy** | `>=1.11.0` | BSD-3-Clause | Allowed | Polyphase sinc resampling and signal envelope filtering |
 | **SoundFile** | `>=0.12.0` | BSD-3-Clause (libsndfile LGPL 2.1+) | Allowed | 48 kHz uncompressed WAV and MP3 encoding/decoding |
 | **pyloudnorm** | `>=0.1.1` | MIT | Allowed | Standard ITU-R BS.1770-4 loudness measurement |
+| **FastAPI** | `>=0.109.0`| MIT | Allowed | ASGI web framework with OpenAPI 3.1 support |
+| **Uvicorn** | `>=0.27.0` | BSD-3-Clause | Allowed | High-performance ASGI production server |
+| **SQLAlchemy** | `>=2.0.25`| MIT | Allowed | Database ORM and connection pooling |
+| **Celery** | `>=5.3.6`  | BSD-3-Clause | Allowed | Distributed asynchronous task queue for audio worker |
+| **Redis** | `>=5.0.1`  | MIT | Allowed | Message broker and in-memory rate limiting store |
+| **MinIO Client**| `>=7.2.0`| Apache-2.0 | Allowed | S3-compatible object storage SDK |
 | **Pydantic** | `>=2.7.0` | MIT | Allowed | Data validation and structured manifest schemas |
 | **pydantic-settings** | `>=2.1.0` | MIT | Allowed | Environment variable parsing and `.env` support |
 | **HTTPX** | `>=0.25.0` | BSD-3-Clause | Allowed | Async and sync HTTP client for provider REST APIs |
-| **python-dotenv** | `>=1.0.0` | BSD-3-Clause | Allowed | Local `.env` credential loading |
+| **structlog** | `>=24.1.0` | Apache-2.0 / MIT | Allowed | Machine-readable structured JSON logging |
 | **pytest** | `>=7.4.0` | MIT | Allowed | Automated test execution framework |
+| **React** | `^19.3.0`  | MIT | Allowed | Frontend UI library for Audio Studio dashboard |
+| **Vite** | `^8.3.0`   | MIT | Allowed | Frontend build tool and development server |
+| **Lucide React**| `^1.61.0`| ISC | Allowed | Interface iconography |
 
 ---
 

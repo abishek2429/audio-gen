@@ -1,0 +1,19 @@
+{
+  "prompt": "cold start benchmark instrumental",
+  "duration_s": 60.0,
+  "sections": null,
+  "tempo_bpm": null,
+  "key": null,
+  "loopable": false,
+  "narration_url": null,
+  "callback_url": null,
+  "seed": null,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav",
+      "mp3"
+    ]
+  }
+}

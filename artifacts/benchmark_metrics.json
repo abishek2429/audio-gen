@@ -1,0 +1,13 @@
+{
+  "cold_60s_time_s": 10.89,
+  "warm_60s_time_s": 12.12,
+  "warm_60s_worker_s": 0.0,
+  "actual_cost_per_minute_usd": 0.0,
+  "max_duration_error_s": 0.0,
+  "integrated_lufs": -16.0,
+  "true_peak_dbtp": -3.09,
+  "stem_reconstruction_sdr_db": 114.38,
+  "max_stem_correlation_leakage": 0.009,
+  "concurrency_5_success_rate": 1.0,
+  "concurrency_5_avg_time_s": 10.23
+}
