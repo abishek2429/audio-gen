@@ -1,0 +1,27 @@
+{
+  "prompt": "dramatic cinematic trailer building in intensity with orchestral strings and epic drums",
+  "duration_s": 45.0,
+  "tempo_bpm": 96,
+  "key": "D minor",
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "gentle string intro"
+    },
+    {
+      "start_s": 15.0,
+      "mood": "brass build-up"
+    },
+    {
+      "start_s": 30.0,
+      "mood": "full orchestral climax"
+    }
+  ],
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

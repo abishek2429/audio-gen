@@ -4,6 +4,31 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, Optional
 
 
+class ProviderException(Exception):
+    """Base exception for provider operations."""
+    code: str = "PROVIDER_ERROR"
+    retryable: bool = False
+
+    def __init__(self, message: str, code: Optional[str] = None, retryable: Optional[bool] = None):
+        super().__init__(message)
+        if code:
+            self.code = code
+        if retryable is not None:
+            self.retryable = retryable
+
+
+class ProviderTimeoutException(ProviderException):
+    """Raised when an external audio provider API times out."""
+    code: str = "PROVIDER_TIMEOUT"
+    retryable: bool = True
+
+
+class ProviderMalformedResponseException(ProviderException):
+    """Raised when an external audio provider returns malformed or invalid data."""
+    code: str = "PROVIDER_MALFORMED_RESPONSE"
+    retryable: bool = False
+
+
 @dataclass
 class GenerationResult:
     """Output from an AI music generation provider."""

@@ -1,0 +1,11 @@
+{
+  "status_code": 202,
+  "body": {
+    "job_id": "job_a62407802eca",
+    "status": "queued",
+    "progress": 0,
+    "created_at": "2026-10-23T14:27:12.124690+00:00",
+    "message": "Job accepted and queued for processing"
+  },
+  "elapsed_s": 2.0864524841308594
+}

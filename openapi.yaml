@@ -384,6 +384,7 @@ components:
         output:
           $ref: '#/components/schemas/OutputConfig'
           description: Output audio configuration
+      additionalProperties: false
       type: object
       required:
       - prompt
@@ -408,6 +409,7 @@ components:
           type: array
           title: Formats
           description: Output container formats
+      additionalProperties: false
       type: object
       title: OutputConfig
       description: Audio rendering and format settings.
@@ -423,6 +425,7 @@ components:
           minLength: 1
           title: Mood
           description: Mood or instrumentation instruction for this section
+      additionalProperties: false
       type: object
       required:
       - start_s

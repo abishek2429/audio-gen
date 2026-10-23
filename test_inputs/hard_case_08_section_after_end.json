@@ -1,0 +1,21 @@
+{
+  "prompt": "cinematic soundtrack",
+  "duration_s": 15.0,
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "intro"
+    },
+    {
+      "start_s": 20.0,
+      "mood": "climax after track end"
+    }
+  ],
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

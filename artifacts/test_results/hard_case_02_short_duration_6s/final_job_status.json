@@ -1,0 +1,91 @@
+{
+  "job_id": "job_dc0a02045cae",
+  "status": "succeeded",
+  "progress": 100,
+  "result": {
+    "mix_wav": "/api/v1/storage/job_dc0a02045cae/mix.wav",
+    "mix_mp3": "/api/v1/storage/job_dc0a02045cae/mix.mp3",
+    "mix_ducked_wav": null,
+    "stems": {
+      "drums": "/api/v1/storage/job_dc0a02045cae/stems/drums.wav",
+      "bass": "/api/v1/storage/job_dc0a02045cae/stems/bass.wav",
+      "harmony": "/api/v1/storage/job_dc0a02045cae/stems/harmony.wav",
+      "melody": "/api/v1/storage/job_dc0a02045cae/stems/melody.wav",
+      "vocals": "/api/v1/storage/job_dc0a02045cae/stems/vocals.wav"
+    },
+    "manifest": "/api/v1/storage/job_dc0a02045cae/music_manifest.json",
+    "validation_report": "/api/v1/storage/job_dc0a02045cae/validation_report.json"
+  },
+  "manifest": {
+    "job_id": "job_dc0a02045cae",
+    "prompt": "crisp modern acoustic sting for youtube transition",
+    "requested_duration_s": 6.0,
+    "actual_duration_s": 6.0,
+    "sample_rate": 48000,
+    "tempo_bpm": 120,
+    "key": "G major",
+    "sections": [
+      {
+        "start_s": 0.0,
+        "mood": "crisp modern acoustic sting for youtube transition"
+      }
+    ],
+    "beat_grid_s": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0,
+      3.5,
+      4.0,
+      4.5,
+      5.0,
+      5.5,
+      6.0
+    ],
+    "stems": {
+      "drums": "stems/drums.wav",
+      "bass": "stems/bass.wav",
+      "harmony": "stems/harmony.wav",
+      "melody": "stems/melody.wav",
+      "vocals": "stems/vocals.wav"
+    },
+    "stem_gains": {
+      "drums": 1.0,
+      "bass": 1.0,
+      "harmony": 1.0,
+      "melody": 1.0,
+      "vocals": 1.0
+    },
+    "models": {
+      "music_generator": "mock:mock-procedural-v1.0",
+      "stem_separator": "mock:v1"
+    },
+    "provider": "mock",
+    "seed": null,
+    "audio_metrics": {
+      "integrated_lufs": -16.0,
+      "true_peak_dbtp": -3.64,
+      "master_gain": 0.7659
+    },
+    "timings_s": {
+      "generation_time_s": 0.119,
+      "separation_time_s": 0.037,
+      "dsp_time_s": 0.255,
+      "total_elapsed_s": 0.954
+    },
+    "cost_usd": 0.0,
+    "commercial_license": {
+      "commercial_cleared": true,
+      "license_type": "Royalty-Free Commercial Video Sync",
+      "attribution_required": false,
+      "terms_reference": "SOURCES.md"
+    },
+    "warnings": []
+  },
+  "error": null,
+  "created_at": "2026-10-23T14:23:58.386517",
+  "updated_at": "2026-10-23T14:23:59.371464"
+}

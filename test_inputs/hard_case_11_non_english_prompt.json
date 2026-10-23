@@ -1,0 +1,13 @@
+{
+  "prompt": "m\u00fasica ac\u00fastica alegre para video corporativo con guitarra brillante y ritmo optimista",
+  "duration_s": 15.0,
+  "tempo_bpm": 115,
+  "key": "A major",
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

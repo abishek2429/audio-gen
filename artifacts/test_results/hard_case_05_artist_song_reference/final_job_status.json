@@ -1,0 +1,112 @@
+{
+  "job_id": "job_f2bcfea30e9a",
+  "status": "succeeded",
+  "progress": 100,
+  "result": {
+    "mix_wav": "/api/v1/storage/job_f2bcfea30e9a/mix.wav",
+    "mix_mp3": "/api/v1/storage/job_f2bcfea30e9a/mix.mp3",
+    "mix_ducked_wav": null,
+    "stems": {
+      "drums": "/api/v1/storage/job_f2bcfea30e9a/stems/drums.wav",
+      "bass": "/api/v1/storage/job_f2bcfea30e9a/stems/bass.wav",
+      "harmony": "/api/v1/storage/job_f2bcfea30e9a/stems/harmony.wav",
+      "melody": "/api/v1/storage/job_f2bcfea30e9a/stems/melody.wav",
+      "vocals": "/api/v1/storage/job_f2bcfea30e9a/stems/vocals.wav"
+    },
+    "manifest": "/api/v1/storage/job_f2bcfea30e9a/music_manifest.json",
+    "validation_report": "/api/v1/storage/job_f2bcfea30e9a/validation_report.json"
+  },
+  "manifest": {
+    "job_id": "job_f2bcfea30e9a",
+    "prompt": "in the style of Taylor Swift - Shake It Off with upbeat acoustic pop guitars",
+    "requested_duration_s": 15.0,
+    "actual_duration_s": 15.0,
+    "sample_rate": 48000,
+    "tempo_bpm": 120,
+    "key": "G major",
+    "sections": [
+      {
+        "start_s": 0.0,
+        "mood": "in the style of Taylor Swift - Shake It Off with upbeat acoustic pop guitars"
+      }
+    ],
+    "beat_grid_s": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0,
+      3.5,
+      4.0,
+      4.5,
+      5.0,
+      5.5,
+      6.0,
+      6.5,
+      7.0,
+      7.5,
+      8.0,
+      8.5,
+      9.0,
+      9.5,
+      10.0,
+      10.5,
+      11.0,
+      11.5,
+      12.0,
+      12.5,
+      13.0,
+      13.5,
+      14.0,
+      14.5,
+      15.0
+    ],
+    "stems": {
+      "drums": "stems/drums.wav",
+      "bass": "stems/bass.wav",
+      "harmony": "stems/harmony.wav",
+      "melody": "stems/melody.wav",
+      "vocals": "stems/vocals.wav"
+    },
+    "stem_gains": {
+      "drums": 1.0,
+      "bass": 1.0,
+      "harmony": 1.0,
+      "melody": 1.0,
+      "vocals": 1.0
+    },
+    "models": {
+      "music_generator": "mock:mock-procedural-v1.0",
+      "stem_separator": "mock:v1"
+    },
+    "provider": "mock",
+    "seed": null,
+    "audio_metrics": {
+      "integrated_lufs": -16.0,
+      "true_peak_dbtp": -3.43,
+      "master_gain": 0.757
+    },
+    "timings_s": {
+      "generation_time_s": 0.364,
+      "separation_time_s": 0.116,
+      "dsp_time_s": 0.771,
+      "total_elapsed_s": 2.429
+    },
+    "cost_usd": 0.0,
+    "commercial_license": {
+      "commercial_cleared": true,
+      "license_type": "Royalty-Free Commercial Video Sync",
+      "attribution_required": false,
+      "terms_reference": "SOURCES.md"
+    },
+    "warnings": [
+      "Artist reference detected ('taylor swift'). Copyright imitation protection active: transformed to generic acoustic/stylistic descriptors to prevent infringement of existing recordings.",
+      "Song title reference detected ('shake it off'). Copyright protection active: the system will not reproduce copyrighted melodic or harmonic sequences."
+    ]
+  },
+  "error": null,
+  "created_at": "2026-10-23T14:26:02.845139",
+  "updated_at": "2026-10-23T14:26:05.309052"
+}

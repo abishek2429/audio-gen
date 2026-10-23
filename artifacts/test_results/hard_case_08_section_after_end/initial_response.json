@@ -1,0 +1,19 @@
+{
+  "status_code": 400,
+  "body": {
+    "error": {
+      "code": "INVALID_REQUEST",
+      "message": "Request payload validation failed.",
+      "retryable": false,
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body",
+            "message": "Value error, Section start_s (20.0s) begins after requested track duration (15.0s)."
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_s": 2.059724807739258
+}

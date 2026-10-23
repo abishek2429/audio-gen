@@ -1,0 +1,67 @@
+{
+  "job_id": "job_3622f9d21e67",
+  "prompt": "energetic electronic bumper intro for podcast",
+  "requested_duration_s": 5.0,
+  "actual_duration_s": 5.0,
+  "sample_rate": 48000,
+  "tempo_bpm": 128,
+  "key": "F major",
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "energetic electronic bumper intro for podcast"
+    }
+  ],
+  "beat_grid_s": [
+    0.0,
+    0.4688,
+    0.9375,
+    1.4062,
+    1.875,
+    2.3438,
+    2.8125,
+    3.2812,
+    3.75,
+    4.2188,
+    4.6875
+  ],
+  "stems": {
+    "drums": "stems/drums.wav",
+    "bass": "stems/bass.wav",
+    "harmony": "stems/harmony.wav",
+    "melody": "stems/melody.wav",
+    "vocals": "stems/vocals.wav"
+  },
+  "stem_gains": {
+    "drums": 1.0,
+    "bass": 1.0,
+    "harmony": 1.0,
+    "melody": 1.0,
+    "vocals": 1.0
+  },
+  "models": {
+    "music_generator": "mock:mock-procedural-v1.0",
+    "stem_separator": "mock:v1"
+  },
+  "provider": "mock",
+  "seed": null,
+  "audio_metrics": {
+    "integrated_lufs": -16.0,
+    "true_peak_dbtp": -2.85,
+    "master_gain": 0.8022
+  },
+  "timings_s": {
+    "generation_time_s": 0.122,
+    "separation_time_s": 0.03,
+    "dsp_time_s": 0.338,
+    "total_elapsed_s": 1.233
+  },
+  "cost_usd": 0.0,
+  "commercial_license": {
+    "commercial_cleared": true,
+    "license_type": "Royalty-Free Commercial Video Sync",
+    "attribution_required": false,
+    "terms_reference": "SOURCES.md"
+  },
+  "warnings": []
+}

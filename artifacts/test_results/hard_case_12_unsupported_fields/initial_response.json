@@ -1,0 +1,19 @@
+{
+  "status_code": 400,
+  "body": {
+    "error": {
+      "code": "INVALID_REQUEST",
+      "message": "Request payload validation failed.",
+      "retryable": false,
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body -> unsupported_field_name",
+            "message": "Extra inputs are not permitted"
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_s": 2.111361265182495
+}

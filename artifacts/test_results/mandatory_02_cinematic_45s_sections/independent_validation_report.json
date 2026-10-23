@@ -1,0 +1,88 @@
+{
+  "job_id": "job_8573ceb661d0",
+  "overall_passed": true,
+  "evaluated_at": "2026-10-23T14:28:45.438630+00:00",
+  "gates": {
+    "files_exist": {
+      "passed": true,
+      "details": {
+        "mix_exists": true,
+        "manifest_exists": true,
+        "stems_dir_exists": true
+      }
+    },
+    "sample_rate_and_format": {
+      "passed": true,
+      "details": {
+        "expected_sr": 48000,
+        "actual_sr": 48000,
+        "format": "WAV",
+        "subtype": "PCM_24"
+      }
+    },
+    "exact_duration": {
+      "passed": true,
+      "details": {
+        "requested_duration_s": 45.0,
+        "actual_duration_s": 45.0,
+        "difference_s": 0.0,
+        "tolerance_s": 0.05
+      }
+    },
+    "intentional_ending": {
+      "passed": true,
+      "details": {
+        "tail_50ms_rms_dbfs": -86.09,
+        "threshold_dbfs": -35.0,
+        "has_hard_cut": false
+      }
+    },
+    "integrated_loudness": {
+      "passed": true,
+      "details": {
+        "target_lufs": -16.0,
+        "actual_lufs": -16.0,
+        "difference_lu": 0.0,
+        "allowed_tolerance_lu": 1.0
+      }
+    },
+    "true_peak": {
+      "passed": true,
+      "details": {
+        "ceiling_dbtp": -1.0,
+        "actual_dbtp": -2.28
+      }
+    },
+    "stem_count": {
+      "passed": true,
+      "details": {
+        "stems_found": 5,
+        "stem_names": [
+          "bass.wav",
+          "drums.wav",
+          "harmony.wav",
+          "melody.wav",
+          "vocals.wav"
+        ],
+        "min_required": 3
+      }
+    },
+    "stem_reconstruction": {
+      "passed": true,
+      "details": {
+        "sdr_db": 115.05,
+        "min_threshold_sdr_db": 20.0,
+        "residual_relative_rms_db": -115.05
+      }
+    },
+    "instrumental_purity": {
+      "passed": true,
+      "details": {
+        "vocal_stem_found": true,
+        "vocal_rms_dbfs": -240.0,
+        "threshold_dbfs": -55.0
+      }
+    }
+  },
+  "summary": "Validation PASSED: Duration diff=0.0000s, Loudness=-16.00 LUFS, True Peak=-2.28 dBTP, SDR=115.05 dB, Stems=5"
+}

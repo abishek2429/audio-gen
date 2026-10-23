@@ -1,0 +1,25 @@
+{
+  "prompt": "electronic dance track with rapid changes",
+  "duration_s": 20.0,
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "intro"
+    },
+    {
+      "start_s": 2.0,
+      "mood": "beat drop"
+    },
+    {
+      "start_s": 2.8,
+      "mood": "synth solo"
+    }
+  ],
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

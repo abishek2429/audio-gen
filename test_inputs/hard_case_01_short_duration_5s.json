@@ -1,0 +1,13 @@
+{
+  "prompt": "energetic electronic bumper intro for podcast",
+  "duration_s": 5.0,
+  "tempo_bpm": 128,
+  "key": "F major",
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

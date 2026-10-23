@@ -1,0 +1,85 @@
+{
+  "job_id": "job_8d6d64155323",
+  "prompt": "calm but aggressive corporate presentation with relaxing intense rhythm",
+  "requested_duration_s": 15.0,
+  "actual_duration_s": 15.0,
+  "sample_rate": 48000,
+  "tempo_bpm": 100,
+  "key": "A minor",
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "calm but aggressive corporate presentation with relaxing intense rhythm"
+    }
+  ],
+  "beat_grid_s": [
+    0.0,
+    0.6,
+    1.2,
+    1.8,
+    2.4,
+    3.0,
+    3.6,
+    4.2,
+    4.8,
+    5.4,
+    6.0,
+    6.6,
+    7.2,
+    7.8,
+    8.4,
+    9.0,
+    9.6,
+    10.2,
+    10.8,
+    11.4,
+    12.0,
+    12.6,
+    13.2,
+    13.8,
+    14.4,
+    15.0
+  ],
+  "stems": {
+    "drums": "stems/drums.wav",
+    "bass": "stems/bass.wav",
+    "harmony": "stems/harmony.wav",
+    "melody": "stems/melody.wav",
+    "vocals": "stems/vocals.wav"
+  },
+  "stem_gains": {
+    "drums": 1.0,
+    "bass": 1.0,
+    "harmony": 1.0,
+    "melody": 1.0,
+    "vocals": 1.0
+  },
+  "models": {
+    "music_generator": "mock:mock-procedural-v1.0",
+    "stem_separator": "mock:v1"
+  },
+  "provider": "mock",
+  "seed": null,
+  "audio_metrics": {
+    "integrated_lufs": -16.0,
+    "true_peak_dbtp": -3.95,
+    "master_gain": 0.743
+  },
+  "timings_s": {
+    "generation_time_s": 0.32,
+    "separation_time_s": 0.107,
+    "dsp_time_s": 0.779,
+    "total_elapsed_s": 2.371
+  },
+  "cost_usd": 0.0,
+  "commercial_license": {
+    "commercial_cleared": true,
+    "license_type": "Royalty-Free Commercial Video Sync",
+    "attribution_required": false,
+    "terms_reference": "SOURCES.md"
+  },
+  "warnings": [
+    "Contradictory prompt descriptors detected ('calm' and 'aggressive'). Interpreting as dynamic contrast: gradual progression from calm to aggressive.",
+    "Contradictory prompt descriptors detected ('relaxing' and 'intense'). Interpreting as dynamic contrast: gradual progression from relaxing to intense."
+  ]
+}

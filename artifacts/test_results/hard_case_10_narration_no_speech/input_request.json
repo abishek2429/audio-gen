@@ -1,0 +1,11 @@
+{
+  "prompt": "ambient acoustic music under ambient room tone",
+  "duration_s": 15.0,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

@@ -12,6 +12,19 @@ from src.config import settings
 logger = logging.getLogger(__name__)
 
 
+class StorageException(Exception):
+    """Raised when object storage upload or retrieval fails."""
+    code: str = "STORAGE_ERROR"
+    retryable: bool = True
+
+    def __init__(self, message: str, code: Optional[str] = None, retryable: Optional[bool] = None):
+        super().__init__(message)
+        if code:
+            self.code = code
+        if retryable is not None:
+            self.retryable = retryable
+
+
 class StorageService:
     """Manages audio file storage and generates presigned download links."""
 

@@ -1,0 +1,15 @@
+{
+  "prompt": "chill lo-fi hip hop beat with warm electric piano and vinyl crackle",
+  "duration_s": 20.0,
+  "tempo_bpm": 84,
+  "key": "A minor",
+  "loopable": true,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav",
+      "mp3"
+    ]
+  }
+}

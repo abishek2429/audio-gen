@@ -1,0 +1,13 @@
+{
+  "prompt": "in the style of Taylor Swift - Shake It Off with upbeat acoustic pop guitars",
+  "duration_s": 15.0,
+  "tempo_bpm": 120,
+  "key": "G major",
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

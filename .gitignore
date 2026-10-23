@@ -19,3 +19,6 @@ htmlcov/
 
 # Logs
 *.log
+
+# Heavy audio binary artifacts (keep metadata/manifests/reports)
+artifacts/**/*.wav

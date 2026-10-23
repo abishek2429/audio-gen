@@ -1,0 +1,13 @@
+{
+  "prompt": "crisp modern acoustic sting for youtube transition",
+  "duration_s": 6.0,
+  "tempo_bpm": 120,
+  "key": "G major",
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav"
+    ]
+  }
+}

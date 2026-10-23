@@ -1,0 +1,384 @@
+{
+  "timestamp": "2026-10-23T14:29:09Z",
+  "total_cases": 15,
+  "passed": 15,
+  "failed": 0,
+  "results": [
+    {
+      "case_name": "hard_case_01_short_duration_5s",
+      "job_id": "job_3622f9d21e67",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.016,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -2.85,
+        "master_gain": 0.8022
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "hard_case_02_short_duration_6s",
+      "job_id": "job_dc0a02045cae",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 19.977,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.64,
+        "master_gain": 0.7659
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "hard_case_03_long_duration_300s",
+      "job_id": "job_20cd81275991",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 84.013,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.56,
+        "master_gain": 0.7101
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "hard_case_04_contradictory_prompt",
+      "job_id": "job_8d6d64155323",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.424,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.95,
+        "master_gain": 0.743
+      },
+      "warnings": [
+        "Contradictory prompt descriptors detected ('calm' and 'aggressive'). Interpreting as dynamic contrast: gradual progression from calm to aggressive.",
+        "Contradictory prompt descriptors detected ('relaxing' and 'intense'). Interpreting as dynamic contrast: gradual progression from relaxing to intense."
+      ],
+      "notes": "Confirmed contradictory warning emitted."
+    },
+    {
+      "case_name": "hard_case_05_artist_song_reference",
+      "job_id": "job_f2bcfea30e9a",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.359,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.43,
+        "master_gain": 0.757
+      },
+      "warnings": [
+        "Artist reference detected ('taylor swift'). Copyright imitation protection active: transformed to generic acoustic/stylistic descriptors to prevent infringement of existing recordings.",
+        "Song title reference detected ('shake it off'). Copyright protection active: the system will not reproduce copyrighted melodic or harmonic sequences."
+      ],
+      "notes": "Confirmed artist protection warning emitted."
+    },
+    {
+      "case_name": "hard_case_06_vocal_request",
+      "job_id": "job_04d59e587468",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.531,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.51,
+        "master_gain": 0.7125
+      },
+      "warnings": [
+        "Vocal request detected in prompt (vocals, singing, lyrics). IncuBrix engine is strictly instrumental-only for background video music. Vocal synthesis suppressed; rendered as melodic instrumental stems."
+      ],
+      "notes": "Confirmed vocal suppression warning emitted; output strictly instrumental."
+    },
+    {
+      "case_name": "hard_case_07_sections_too_close",
+      "status": "PASSED",
+      "http_status": 400,
+      "expected_rejection": true,
+      "error_code": "INVALID_REQUEST",
+      "error_message": "Request payload validation failed.",
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body",
+            "message": "Value error, Sections must be at least 1.5 seconds apart to allow musical transitions; sections at 2.0s and 2.8s have gap 0.80s."
+          }
+        ]
+      },
+      "elapsed_s": 2.087,
+      "summary": "Correctly rejected invalid input at request boundary."
+    },
+    {
+      "case_name": "hard_case_08_section_after_end",
+      "status": "PASSED",
+      "http_status": 400,
+      "expected_rejection": true,
+      "error_code": "INVALID_REQUEST",
+      "error_message": "Request payload validation failed.",
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body",
+            "message": "Value error, Section start_s (20.0s) begins after requested track duration (15.0s)."
+          }
+        ]
+      },
+      "elapsed_s": 2.06,
+      "summary": "Correctly rejected invalid input at request boundary."
+    },
+    {
+      "case_name": "hard_case_09_narration_long_silence",
+      "job_id": "job_d389e9dbcaf6",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 24.114,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.28,
+        "master_gain": 0.7994
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "hard_case_10_narration_no_speech",
+      "job_id": "job_a62407802eca",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.401,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -2.99,
+        "master_gain": 0.7373
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "hard_case_11_non_english_prompt",
+      "job_id": "job_06dbefb87de8",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 20.502,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.51,
+        "master_gain": 0.7125
+      },
+      "warnings": [
+        "Non-English prompt detected (ES). Interpreted musical intent as instrumental video cue without error."
+      ],
+      "notes": "Confirmed non-English prompt normalized without error."
+    },
+    {
+      "case_name": "hard_case_12_unsupported_fields",
+      "status": "PASSED",
+      "http_status": 400,
+      "expected_rejection": true,
+      "error_code": "INVALID_REQUEST",
+      "error_message": "Request payload validation failed.",
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body -> unsupported_field_name",
+            "message": "Extra inputs are not permitted"
+          }
+        ]
+      },
+      "elapsed_s": 2.111,
+      "summary": "Correctly rejected invalid input at request boundary."
+    },
+    {
+      "case_name": "mandatory_01_standard_30s",
+      "job_id": "job_e687a300d489",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 24.266,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.87,
+        "master_gain": 0.7119
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "mandatory_02_cinematic_45s_sections",
+      "job_id": "job_8573ceb661d0",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 28.133,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -2.28,
+        "master_gain": 0.8088
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    },
+    {
+      "case_name": "mandatory_03_lofi_loopable_20s",
+      "job_id": "job_15e1a65c3474",
+      "status": "PASSED",
+      "overall_passed": true,
+      "elapsed_s": 23.683,
+      "cost_usd": 0.0,
+      "gates": {
+        "files_exist": true,
+        "sample_rate_and_format": true,
+        "exact_duration": true,
+        "intentional_ending": true,
+        "integrated_loudness": true,
+        "true_peak": true,
+        "stem_count": true,
+        "stem_reconstruction": true,
+        "instrumental_purity": true
+      },
+      "audio_metrics": {
+        "integrated_lufs": -16.0,
+        "true_peak_dbtp": -3.42,
+        "master_gain": 0.7389
+      },
+      "warnings": [],
+      "notes": "All Must-Have gates verified."
+    }
+  ]
+}

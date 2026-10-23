@@ -1,0 +1,110 @@
+{
+  "job_id": "job_d389e9dbcaf6",
+  "status": "succeeded",
+  "progress": 100,
+  "result": {
+    "mix_wav": "/api/v1/storage/job_d389e9dbcaf6/mix.wav",
+    "mix_mp3": "/api/v1/storage/job_d389e9dbcaf6/mix.mp3",
+    "mix_ducked_wav": null,
+    "stems": {
+      "drums": "/api/v1/storage/job_d389e9dbcaf6/stems/drums.wav",
+      "bass": "/api/v1/storage/job_d389e9dbcaf6/stems/bass.wav",
+      "harmony": "/api/v1/storage/job_d389e9dbcaf6/stems/harmony.wav",
+      "melody": "/api/v1/storage/job_d389e9dbcaf6/stems/melody.wav",
+      "vocals": "/api/v1/storage/job_d389e9dbcaf6/stems/vocals.wav"
+    },
+    "manifest": "/api/v1/storage/job_d389e9dbcaf6/music_manifest.json",
+    "validation_report": "/api/v1/storage/job_d389e9dbcaf6/validation_report.json"
+  },
+  "manifest": {
+    "job_id": "job_d389e9dbcaf6",
+    "prompt": "documentary background bed under sporadic narration with long silent gaps",
+    "requested_duration_s": 25.0,
+    "actual_duration_s": 25.0,
+    "sample_rate": 48000,
+    "tempo_bpm": 90,
+    "key": "E minor",
+    "sections": [
+      {
+        "start_s": 0.0,
+        "mood": "documentary background bed under sporadic narration with long silent gaps"
+      }
+    ],
+    "beat_grid_s": [
+      0.0,
+      0.6667,
+      1.3333,
+      2.0,
+      2.6667,
+      3.3333,
+      4.0,
+      4.6667,
+      5.3333,
+      6.0,
+      6.6667,
+      7.3333,
+      8.0,
+      8.6667,
+      9.3333,
+      10.0,
+      10.6667,
+      11.3333,
+      12.0,
+      12.6667,
+      13.3333,
+      14.0,
+      14.6667,
+      15.3333,
+      16.0,
+      16.6667,
+      17.3333,
+      18.0,
+      18.6667,
+      19.3333,
+      20.0,
+      20.6667
+    ],
+    "stems": {
+      "drums": "stems/drums.wav",
+      "bass": "stems/bass.wav",
+      "harmony": "stems/harmony.wav",
+      "melody": "stems/melody.wav",
+      "vocals": "stems/vocals.wav"
+    },
+    "stem_gains": {
+      "drums": 1.0,
+      "bass": 1.0,
+      "harmony": 1.0,
+      "melody": 1.0,
+      "vocals": 1.0
+    },
+    "models": {
+      "music_generator": "mock:mock-procedural-v1.0",
+      "stem_separator": "mock:v1"
+    },
+    "provider": "mock",
+    "seed": null,
+    "audio_metrics": {
+      "integrated_lufs": -16.0,
+      "true_peak_dbtp": -3.28,
+      "master_gain": 0.7994
+    },
+    "timings_s": {
+      "generation_time_s": 0.546,
+      "separation_time_s": 0.181,
+      "dsp_time_s": 1.232,
+      "total_elapsed_s": 3.825
+    },
+    "cost_usd": 0.0,
+    "commercial_license": {
+      "commercial_cleared": true,
+      "license_type": "Royalty-Free Commercial Video Sync",
+      "attribution_required": false,
+      "terms_reference": "SOURCES.md"
+    },
+    "warnings": []
+  },
+  "error": null,
+  "created_at": "2026-10-23T14:26:48.013884",
+  "updated_at": "2026-10-23T14:26:51.868738"
+}

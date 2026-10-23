@@ -1,0 +1,19 @@
+{
+  "status_code": 400,
+  "body": {
+    "error": {
+      "code": "INVALID_REQUEST",
+      "message": "Request payload validation failed.",
+      "retryable": false,
+      "details": {
+        "validation_errors": [
+          {
+            "location": "body",
+            "message": "Value error, Sections must be at least 1.5 seconds apart to allow musical transitions; sections at 2.0s and 2.8s have gap 0.80s."
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_s": 2.0872409343719482
+}

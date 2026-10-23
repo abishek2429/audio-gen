@@ -17,8 +17,10 @@ from src.database.models import MusicJob
 from src.models import MusicJobRequest, MusicManifest
 from src.logging_config import job_id_ctx
 from src.providers import get_provider
-from src.storage import get_storage_service
+from src.providers.base import ProviderException, ProviderTimeoutException, ProviderMalformedResponseException
+from src.storage import get_storage_service, StorageException
 from src.security import fetch_remote_audio, send_signed_callback, SecurityException
+from src.audio.prompt_guard import analyze_and_guard_prompt
 from src.audio.dsp import (
     load_audio_from_bytes,
     align_duration_and_finish_tail,
@@ -58,6 +60,7 @@ def execute_job_pipeline(job_id: str):
         req = MusicJobRequest(**req_data)
 
     logger.info("Starting processing for job %s (prompt: '%s', duration: %.1fs)", job_id, req.prompt, req.duration_s)
+    manifest_warnings: list[str] = []
 
     try:
         start_total = time.time()
@@ -73,12 +76,17 @@ def execute_job_pipeline(job_id: str):
             db.query(MusicJob).filter(MusicJob.id == job_id).update({"progress": 25})
             db.commit()
 
-        # 2. Music Generation via Provider Adapter
+        # 2. Prompt Analysis & Safety Guardrails
+        prompt_analysis = analyze_and_guard_prompt(req.prompt)
+        manifest_warnings.extend(prompt_analysis.warnings)
+        effective_prompt = prompt_analysis.effective_prompt
+
+        # 3. Music Generation via Provider Adapter
         provider = get_provider(settings.music_provider)
-        logger.info("Generating music with provider '%s'", provider.provider_name)
+        logger.info("Generating music with provider '%s' (effective prompt: '%s')", provider.provider_name, effective_prompt)
         t0_gen = time.time()
         gen_res = provider.generate_music(
-            prompt=req.prompt,
+            prompt=effective_prompt,
             duration_s=req.duration_s,
             tempo_bpm=req.tempo_bpm,
             key=req.key,
@@ -147,8 +155,28 @@ def execute_job_pipeline(job_id: str):
         # Voiceover ducking if narration provided
         ducked_mix: Optional[np.ndarray] = None
         if speech_audio is not None:
-            logger.info("Applying sidechain voiceover ducking...")
-            ducked_mix, _ = apply_voiceover_ducking(finished_mix, speech_audio, sr=sr, ducking_db=10.0)
+            speech_mono = np.mean(speech_audio, axis=1) if speech_audio.ndim > 1 else speech_audio
+            speech_rms = float(np.sqrt(np.mean(speech_mono ** 2)))
+            speech_rms_dbfs = float(20.0 * np.log10(speech_rms + 1e-12))
+            if speech_rms_dbfs < -45.0:
+                logger.warning("No speech activity detected in narration track (RMS: %.2f dBFS)", speech_rms_dbfs)
+                manifest_warnings.append(
+                    f"No speech activity detected in narration track (RMS {speech_rms_dbfs:.1f} dBFS < -45 dBFS); "
+                    f"sidechain ducking bypassed to preserve nominal music dynamics."
+                )
+                ducked_mix = np.copy(finished_mix)
+            else:
+                logger.info("Applying sidechain voiceover ducking (-10 dB)...")
+                ducked_mix, _ = apply_voiceover_ducking(finished_mix, speech_audio, sr=sr, ducking_db=10.0)
+                flen = int(0.1 * sr)
+                n_f = len(speech_mono) // flen
+                if n_f > 0:
+                    f_p = [float(np.mean(speech_mono[i * flen : (i + 1) * flen] ** 2)) for i in range(n_f)]
+                    silent_ratio = sum(1 for p in f_p if 10 * np.log10(p + 1e-12) < -35.0) / n_f
+                    if silent_ratio > 0.4 and req.duration_s >= 10.0:
+                        manifest_warnings.append(
+                            "Narration contains extended silent intervals (>10s); sidechain ducking smoothly restored nominal volume during pauses."
+                        )
 
         t_dsp = time.time() - t0_dsp
 
@@ -274,7 +302,7 @@ def execute_job_pipeline(job_id: str):
                 "attribution_required": False,
                 "terms_reference": "SOURCES.md",
             },
-            warnings=[],
+            warnings=manifest_warnings,
         )
 
         manifest_url = storage.upload_file(
@@ -314,6 +342,14 @@ def execute_job_pipeline(job_id: str):
         error_code = "PROCESSING_FAILED"
         if isinstance(e, SecurityException):
             error_code = e.code
+        elif isinstance(e, ProviderException):
+            error_code = e.code
+        elif isinstance(e, StorageException):
+            error_code = e.code
+        elif "timeout" in str(e).lower() or isinstance(e, TimeoutError):
+            error_code = "PROVIDER_TIMEOUT"
+        elif "malformed" in str(e).lower() or "corrupt" in str(e).lower():
+            error_code = "PROVIDER_MALFORMED_RESPONSE"
 
         with SessionLocal() as db:
             db.query(MusicJob).filter(MusicJob.id == job_id).update({

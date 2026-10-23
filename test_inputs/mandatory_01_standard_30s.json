@@ -1,0 +1,15 @@
+{
+  "prompt": "warm optimistic acoustic pop for a corporate video presentation with acoustic guitar and light percussion",
+  "duration_s": 30.0,
+  "tempo_bpm": 110,
+  "key": "C major",
+  "loopable": false,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav",
+      "mp3"
+    ]
+  }
+}

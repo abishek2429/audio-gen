@@ -1,23 +1,49 @@
 """Data models and OpenAPI 3.1 schemas for IncuBrix AI Background Music Engine."""
 from typing import List, Dict, Optional, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict, model_validator, field_validator
 
 
 class SectionPlan(BaseModel):
     """Mood change section at a specific video cut point."""
+    model_config = ConfigDict(extra="forbid")
     start_s: float = Field(..., ge=0.0, description="Start time in seconds")
     mood: str = Field(..., min_length=1, description="Mood or instrumentation instruction for this section")
 
 
 class OutputConfig(BaseModel):
     """Audio rendering and format settings."""
+    model_config = ConfigDict(extra="forbid")
     sample_rate: int = Field(default=48000, description="Target sample rate in Hz (default: 48000)")
     target_lufs: float = Field(default=-16.0, description="Target integrated loudness in LUFS (default: -16.0)")
     formats: List[str] = Field(default_factory=lambda: ["wav", "mp3"], description="Output container formats")
 
+    @field_validator("sample_rate")
+    @classmethod
+    def validate_sample_rate(cls, v: int) -> int:
+        if v not in (44100, 48000):
+            raise ValueError(f"Unsupported sample_rate: {v}. Supported rates are 44100 and 48000 Hz.")
+        return v
+
+    @field_validator("target_lufs")
+    @classmethod
+    def validate_target_lufs(cls, v: float) -> float:
+        if not (-30.0 <= v <= -6.0):
+            raise ValueError(f"target_lufs ({v}) must be between -30.0 and -6.0 LUFS.")
+        return v
+
+    @field_validator("formats")
+    @classmethod
+    def validate_formats(cls, v: List[str]) -> List[str]:
+        valid_formats = {"wav", "mp3"}
+        for fmt in v:
+            if fmt.lower() not in valid_formats:
+                raise ValueError(f"Unsupported format '{fmt}'. Supported formats are 'wav' and 'mp3'.")
+        return [fmt.lower() for fmt in v]
+
 
 class MusicJobRequest(BaseModel):
     """Primary request payload matching the IncuBrix Integration Standard."""
+    model_config = ConfigDict(extra="forbid")
     prompt: str = Field(..., min_length=1, description="Text prompt describing mood, genre, and instrumentation")
     duration_s: float = Field(..., ge=5.0, le=300.0, description="Duration in seconds (5.0 to 300.0s)")
     sections: Optional[List[SectionPlan]] = Field(default=None, description="Optional mood changes at video edit points")
@@ -28,6 +54,24 @@ class MusicJobRequest(BaseModel):
     callback_url: Optional[str] = Field(default=None, description="Optional webhook URL to receive HMAC-signed job completion")
     seed: Optional[int] = Field(default=None, description="Optional random seed for reproducible synthesis")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output audio configuration")
+
+    @model_validator(mode="after")
+    def validate_sections_timing(self) -> "MusicJobRequest":
+        if self.sections:
+            sorted_sections = sorted(self.sections, key=lambda s: s.start_s)
+            for i, sec in enumerate(sorted_sections):
+                if sec.start_s > self.duration_s:
+                    raise ValueError(
+                        f"Section start_s ({sec.start_s}s) begins after requested track duration ({self.duration_s}s)."
+                    )
+                if i > 0:
+                    gap = sec.start_s - sorted_sections[i - 1].start_s
+                    if gap < 1.5:
+                        raise ValueError(
+                            f"Sections must be at least 1.5 seconds apart to allow musical transitions; "
+                            f"sections at {sorted_sections[i - 1].start_s}s and {sec.start_s}s have gap {gap:.2f}s."
+                        )
+        return self
 
 
 class JobAcceptedResponse(BaseModel):
