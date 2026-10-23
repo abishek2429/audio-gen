@@ -248,3 +248,48 @@ python -m src.cli \
   --key "G major" \
   --output-dir sample_audio_packs/acoustic_30s
 ```
+
+---
+
+## 7. React + TypeScript Web Dashboard
+
+A modern, dark-themed audio-production web interface for the IncuBrix AI Background Music Engine.
+
+### 7.1 Features
+- **Dashboard Overview:** Real-time job metrics (Total, Successful, Failed, Active/Queued), engine health indicator, recent generations table, and one-click production presets.
+- **Music Generation Studio:** Full parameter control (prompt, 5–300s duration slider with ±0.05s precision, tempo BPM, musical key, loopable toggle, dynamic video cut points section editor, SSRF-protected narration URL, random seed, sample rate 48k/44.1k, and target LUFS selection).
+- **Live Job Polling:** Non-blocking asynchronous progress tracker with 6-stage pipeline visualization, automatic polling, and detailed error handling.
+- **Multitrack Audio Studio:** Master mix audio player with canvas waveform, individual multitrack stem mixers (Drums, Bass, Harmony, Melody, Vocals) with solo/mute buttons, voiceover ducked mix bed (-10 dB), and download links for uncompressed 48 kHz WAV files.
+- **Manifest Inspector:** Structured tree view of `music_manifest.json` with copyright clearance provenance and 1-click JSON download.
+- **Job History:** Real-time database history table with search filtering and direct links to Audio Studio and Manifest views.
+
+### 7.2 Running the Dashboard Locally
+
+```bash
+# 1. Start the FastAPI backend server (Port 8000)
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+# 2. In a separate terminal, navigate to frontend and install dependencies
+cd frontend
+npm install
+
+# 3. Start Vite development server (Port 3000)
+npm run dev
+
+# 4. Open browser at http://localhost:3000
+```
+
+### 7.3 Frontend Configuration & Testing
+
+- **Backend API URL:** Configured via `VITE_API_BASE_URL` in `frontend/.env` (defaults to `http://localhost:8000`, with Vite dev server proxying `/api`, `/health`, and `/ready`).
+- **Run Unit & Component Tests:**
+  ```bash
+  cd frontend
+  npm test
+  ```
+- **Run Production Build:**
+  ```bash
+  cd frontend
+  npm run build
+  ```
+

@@ -152,6 +152,37 @@ def create_music_job(
 
 
 @router.get(
+    "/jobs",
+    response_model=list[JobStatusResponse],
+    summary="List all jobs",
+    description="Retrieve a list of music generation jobs ordered by creation date descending.",
+)
+def list_jobs(limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
+    """List recent music jobs."""
+    jobs = db.query(MusicJob).order_by(MusicJob.created_at.desc()).offset(offset).limit(limit).all()
+    results = []
+    for job in jobs:
+        result_urls = None
+        urls_dict = job.get_result_urls()
+        if urls_dict:
+            result_urls = JobResultURLs(**urls_dict)
+
+        results.append(
+            JobStatusResponse(
+                job_id=job.id,
+                status=job.status,
+                progress=job.progress,
+                result=result_urls,
+                manifest=job.get_manifest(),
+                error=job.get_error(),
+                created_at=job.created_at.isoformat(),
+                updated_at=job.updated_at.isoformat(),
+            )
+        )
+    return results
+
+
+@router.get(
     "/jobs/{job_id}",
     response_model=JobStatusResponse,
     summary="Get job status and download links",

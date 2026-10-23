@@ -1,0 +1,106 @@
+/**
+ * Reusable API Client for IncuBrix AI Background Music Engine.
+ */
+import type {
+  MusicJobRequest,
+  JobAcceptedResponse,
+  JobStatusResponse,
+  HealthCheckResponse,
+  ReadyCheckResponse,
+  ErrorDetail,
+} from "../types/api";
+
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/+$/, "");
+
+export class ApiError extends Error {
+  code: string;
+  statusCode: number;
+  retryable: boolean;
+  details: Record<string, any>;
+
+  constructor(statusCode: number, errorDetail: ErrorDetail) {
+    super(errorDetail.message || "An API error occurred");
+    this.name = "ApiError";
+    this.statusCode = statusCode;
+    this.code = errorDetail.code || "UNKNOWN_ERROR";
+    this.retryable = errorDetail.retryable ?? false;
+    this.details = errorDetail.details || {};
+  }
+}
+
+export function resolveAudioUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:")) {
+    return url;
+  }
+  return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    let errorDetail: ErrorDetail = {
+      code: `HTTP_${res.status}`,
+      message: res.statusText || "Request failed",
+      retryable: res.status >= 500,
+    };
+    try {
+      const data = await res.json();
+      if (data && data.error) {
+        errorDetail = data.error;
+      }
+    } catch {
+      // Non-JSON response
+    }
+    throw new ApiError(res.status, errorDetail);
+  }
+  return res.json() as Promise<T>;
+}
+
+export const apiClient = {
+  getBaseUrl(): string {
+    return API_BASE_URL;
+  },
+
+  async getHealth(): Promise<HealthCheckResponse> {
+    const res = await fetch(`${API_BASE_URL}/health`);
+    return handleResponse<HealthCheckResponse>(res);
+  },
+
+  async getReady(): Promise<ReadyCheckResponse> {
+    const res = await fetch(`${API_BASE_URL}/ready`);
+    return handleResponse<ReadyCheckResponse>(res);
+  },
+
+  async createJob(
+    request: MusicJobRequest,
+    idempotencyKey?: string
+  ): Promise<JobAcceptedResponse> {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (idempotencyKey) {
+      headers["Idempotency-Key"] = idempotencyKey;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/v1/music/jobs`, {
+      method: "POST",
+      headers,
+      body: jsonStringifyCanonical(request),
+    });
+    return handleResponse<JobAcceptedResponse>(res);
+  },
+
+  async getJob(jobId: string): Promise<JobStatusResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/jobs/${encodeURIComponent(jobId)}`);
+    return handleResponse<JobStatusResponse>(res);
+  },
+
+  async listJobs(limit = 50, offset = 0): Promise<JobStatusResponse[]> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/jobs?limit=${limit}&offset=${offset}`);
+    return handleResponse<JobStatusResponse[]>(res);
+  },
+};
+
+function jsonStringifyCanonical(obj: any): string {
+  return JSON.stringify(obj);
+}
