@@ -1,0 +1,42 @@
+"""Provider factory for instantiating the active audio provider adapter."""
+import logging
+from typing import Optional
+
+from src.config import settings
+from src.providers.base import AudioProviderInterface
+from src.providers.mock_provider import MockProvider
+from src.providers.soundverse import SoundverseAdapter
+from src.providers.elevenlabs import ElevenLabsAdapter
+
+logger = logging.getLogger(__name__)
+
+
+def get_provider(provider_name: Optional[str] = None) -> AudioProviderInterface:
+    """Instantiate and return the configured audio provider adapter."""
+    name = (provider_name or settings.music_provider).lower()
+
+    if name == "auto":
+        if settings.soundverse_api_key:
+            name = "soundverse"
+        elif settings.elevenlabs_api_key:
+            name = "elevenlabs"
+        else:
+            logger.info("No external provider API keys found. Defaulting to 'mock' provider.")
+            name = "mock"
+
+    if name == "soundverse":
+        return SoundverseAdapter(
+            api_key=settings.soundverse_api_key,
+            base_url=settings.soundverse_base_url,
+        )
+    elif name == "elevenlabs":
+        return ElevenLabsAdapter(
+            api_key=settings.elevenlabs_api_key,
+            base_url=settings.elevenlabs_base_url,
+        )
+    elif name == "mock":
+        return MockProvider(sample_rate=settings.default_sample_rate)
+    else:
+        raise ValueError(
+            f"Unsupported provider: '{name}'. Choose from 'mock', 'soundverse', 'elevenlabs', or 'auto'."
+        )

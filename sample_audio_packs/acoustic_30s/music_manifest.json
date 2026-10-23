@@ -1,0 +1,88 @@
+{
+  "job_id": "job_f36b505f39a7",
+  "prompt": "uplifting acoustic instrumental",
+  "requested_duration_s": 30.0,
+  "actual_duration_s": 30.0,
+  "sample_rate": 48000,
+  "tempo_bpm": 120,
+  "key": "G major",
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "uplifting acoustic instrumental"
+    }
+  ],
+  "beat_grid_s": [
+    0.0,
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0,
+    5.5,
+    6.0,
+    6.5,
+    7.0,
+    7.5,
+    8.0,
+    8.5,
+    9.0,
+    9.5,
+    10.0,
+    10.5,
+    11.0,
+    11.5,
+    12.0,
+    12.5,
+    13.0,
+    13.5,
+    14.0,
+    14.5,
+    15.0,
+    15.5
+  ],
+  "stems": {
+    "drums": "stems/drums.wav",
+    "bass": "stems/bass.wav",
+    "harmony": "stems/harmony.wav",
+    "melody": "stems/melody.wav",
+    "vocals": "stems/vocals.wav"
+  },
+  "stem_gains": {
+    "drums": 1.0,
+    "bass": 1.0,
+    "harmony": 1.0,
+    "melody": 1.0,
+    "vocals": 1.0
+  },
+  "models": {
+    "music_generator": "mock:mock-procedural-v1.0",
+    "stem_separator": "mock:v1"
+  },
+  "provider": "mock",
+  "seed": 202,
+  "audio_metrics": {
+    "integrated_lufs": -16.0,
+    "true_peak_dbtp": -3.49,
+    "master_finishing_gain": 0.7512
+  },
+  "timings_s": {
+    "generation_time_s": 0.559,
+    "separation_time_s": 0.183,
+    "dsp_time_s": 1.797,
+    "total_elapsed_s": 3.646
+  },
+  "cost_usd": 0.0,
+  "commercial_license": {
+    "commercial_cleared": true,
+    "license_type": "Royalty-Free Commercial Video Sync",
+    "attribution_required": false,
+    "terms_reference": "SOURCES.md"
+  },
+  "warnings": []
+}

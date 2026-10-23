@@ -1,0 +1,18 @@
+{
+  "prompt": "cinematic instrumental with a build-up",
+  "duration_s": 60.0,
+  "sections": null,
+  "tempo_bpm": 96,
+  "key": "D minor",
+  "loopable": false,
+  "narration_url": null,
+  "seed": 303,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav",
+      "mp3"
+    ]
+  }
+}

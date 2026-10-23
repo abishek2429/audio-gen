@@ -1,0 +1,75 @@
+{
+  "job_id": "job_80829c9c7aa6",
+  "prompt": "calm corporate instrumental",
+  "requested_duration_s": 10.0,
+  "actual_duration_s": 10.0,
+  "sample_rate": 48000,
+  "tempo_bpm": 110,
+  "key": "C major",
+  "sections": [
+    {
+      "start_s": 0.0,
+      "mood": "calm corporate instrumental"
+    }
+  ],
+  "beat_grid_s": [
+    0.0,
+    0.5455,
+    1.0909,
+    1.6364,
+    2.1818,
+    2.7273,
+    3.2727,
+    3.8182,
+    4.3636,
+    4.9091,
+    5.4545,
+    6.0,
+    6.5455,
+    7.0909,
+    7.6364,
+    8.1818,
+    8.7273,
+    9.2727,
+    9.8182
+  ],
+  "stems": {
+    "drums": "stems/drums.wav",
+    "bass": "stems/bass.wav",
+    "harmony": "stems/harmony.wav",
+    "melody": "stems/melody.wav",
+    "vocals": "stems/vocals.wav"
+  },
+  "stem_gains": {
+    "drums": 1.0,
+    "bass": 1.0,
+    "harmony": 1.0,
+    "melody": 1.0,
+    "vocals": 1.0
+  },
+  "models": {
+    "music_generator": "mock:mock-procedural-v1.0",
+    "stem_separator": "mock:v1"
+  },
+  "provider": "mock",
+  "seed": 101,
+  "audio_metrics": {
+    "integrated_lufs": -16.0,
+    "true_peak_dbtp": -3.75,
+    "master_finishing_gain": 0.7188
+  },
+  "timings_s": {
+    "generation_time_s": 0.18,
+    "separation_time_s": 0.06,
+    "dsp_time_s": 0.524,
+    "total_elapsed_s": 1.304
+  },
+  "cost_usd": 0.0,
+  "commercial_license": {
+    "commercial_cleared": true,
+    "license_type": "Royalty-Free Commercial Video Sync",
+    "attribution_required": false,
+    "terms_reference": "SOURCES.md"
+  },
+  "warnings": []
+}

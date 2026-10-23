@@ -1,0 +1,25 @@
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] =================================================================
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] IncuBrix AI Music Engine — Audio Proof of Concept Pipeline
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] =================================================================
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Job ID: job_f36b505f39a7
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Prompt: 'uplifting acoustic instrumental'
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Target Duration: 30.00 seconds
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Output Directory: C:\audio-gen\sample_audio_packs\acoustic_30s
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Saved request metadata to sample_audio_packs/acoustic_30s\request.json
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Active Provider: mock (model: mock-procedural-v1.0)
+[2026-10-23 13:57:22] [INFO] [incubrix.cli] Step 1: Generating original instrumental audio...
+[2026-10-23 13:57:23] [INFO] [incubrix.cli] Generation completed in 0.56s (Provider latency: 0.56s)
+[2026-10-23 13:57:23] [INFO] [incubrix.cli] Saved original raw provider output to sample_audio_packs/acoustic_30s\raw_generation.wav (8640044 bytes)
+[2026-10-23 13:57:23] [INFO] [incubrix.cli] Step 2: Performing multitrack stem separation...
+[2026-10-23 13:57:23] [INFO] [incubrix.cli] Stem separation completed in 0.18s. Found 5 stems: ['drums', 'bass', 'harmony', 'melody', 'vocals']
+[2026-10-23 13:57:23] [INFO] [incubrix.cli] Step 3: Running DSP Finishing Pipeline...
+[2026-10-23 13:57:25] [INFO] [incubrix.cli] DSP finishing completed in 1.80s: Loudness=-16.00 LUFS, True Peak=-3.49 dBTP, Master Gain=0.7512
+[2026-10-23 13:57:25] [INFO] [incubrix.cli] Saved finished mix to sample_audio_packs/acoustic_30s\mix.wav
+[2026-10-23 13:57:26] [INFO] [incubrix.cli] Saved 5 finished stems to sample_audio_packs/acoustic_30s\stems
+[2026-10-23 13:57:26] [INFO] [incubrix.cli] Saved manifest to sample_audio_packs/acoustic_30s\music_manifest.json
+[2026-10-23 13:57:26] [INFO] [incubrix.cli] Step 4: Running automated mathematical validation...
+[2026-10-23 13:57:27] [INFO] [incubrix.cli] Validation PASSED: Duration diff=0.0000s, Loudness=-16.00 LUFS, True Peak=-3.49 dBTP, SDR=114.34 dB, Stems=5
+[2026-10-23 13:57:27] [INFO] [incubrix.cli] =================================================================
+[2026-10-23 13:57:27] [INFO] [incubrix.cli] PIPELINE EXECUTION COMPLETE: PASSED
+[2026-10-23 13:57:27] [INFO] [incubrix.cli] Total Elapsed Time: 3.65 seconds | Total Cost: $0.0000
+[2026-10-23 13:57:27] [INFO] [incubrix.cli] =================================================================

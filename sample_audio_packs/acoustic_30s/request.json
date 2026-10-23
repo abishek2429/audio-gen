@@ -1,0 +1,18 @@
+{
+  "prompt": "uplifting acoustic instrumental",
+  "duration_s": 30.0,
+  "sections": null,
+  "tempo_bpm": 120,
+  "key": "G major",
+  "loopable": false,
+  "narration_url": null,
+  "seed": 202,
+  "output": {
+    "sample_rate": 48000,
+    "target_lufs": -16.0,
+    "formats": [
+      "wav",
+      "mp3"
+    ]
+  }
+}
