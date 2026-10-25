@@ -5,6 +5,10 @@
     "api/index.py": {
       "maxDuration": 60,
       "excludeFiles": "{sample_audio_packs/**,artifacts/**,storage_data/**,storage_data_test/**,tests/**,test_inputs/**,docs/**,frontend/**,scripts/**,*.xlsx,*.pdf,*.db,*.sqlite3,*.log}"
+    },
+    "main.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{sample_audio_packs/**,artifacts/**,storage_data/**,storage_data_test/**,tests/**,test_inputs/**,docs/**,frontend/**,scripts/**,*.xlsx,*.pdf,*.db,*.sqlite3,*.log}"
     }
   },
   "rewrites": [
