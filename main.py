@@ -38,7 +38,7 @@ except Exception as exc:
 
 
 async def app(scope, receive, send):
-    """ASGI entrypoint with lifespan handling and exception protection for Vercel runtime."""
+    """ASGI entrypoint with lifespan handling, path restoration, and error shielding."""
     if scope.get("type") == "lifespan":
         while True:
             message = await receive()
@@ -47,6 +47,21 @@ async def app(scope, receive, send):
             elif message["type"] == "lifespan.shutdown":
                 await send({"type": "lifespan.shutdown.complete"})
                 return
+
+    if scope.get("type") == "http":
+        headers = dict(scope.get("headers", []))
+        orig_uri = headers.get(b"x-forwarded-uri") or headers.get(b"x-invoke-path")
+        if orig_uri:
+            try:
+                orig_path = orig_uri.decode("utf-8", errors="ignore").split("?")[0]
+                if orig_path:
+                    scope["path"] = orig_path
+            except Exception:
+                pass
+        elif scope.get("path") == "/api/index.py":
+            scope["path"] = "/"
+        elif scope.get("path", "").startswith("/api/index.py/"):
+            scope["path"] = scope["path"][len("/api/index.py"):]
 
     try:
         await fastapi_app(scope, receive, send)

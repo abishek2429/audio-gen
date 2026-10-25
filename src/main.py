@@ -84,6 +84,7 @@ def create_app() -> FastAPI:
         # 2. Demo access protection (when DEMO_API_KEY is configured)
         public_paths = {
             "/",
+            "/api/index.py",
             "/health",
             "/ready",
             "/api/health",
@@ -201,6 +202,7 @@ def create_app() -> FastAPI:
         )
 
     # Root API metadata endpoint
+    @app.get("/api/index.py", summary="API Root (Vercel Alias)", include_in_schema=False)
     @app.get("/", summary="API Root", include_in_schema=False)
     def api_root():
         """Root API metadata endpoint returning operational status and documentation links."""
