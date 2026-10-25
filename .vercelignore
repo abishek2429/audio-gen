@@ -31,8 +31,9 @@ Dockerfile
 docker-compose.yml
 render.yaml
 
-# Frontend files (when deploying backend function)
-frontend/
+# Frontend build cache and local dependencies (preserve frontend source!)
+frontend/node_modules/
+frontend/dist/
 node_modules/
 
 # Python compiled bytecode

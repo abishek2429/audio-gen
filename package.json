@@ -1,0 +1,10 @@
+{
+  "name": "incubrix-studio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "npm --prefix frontend run dev",
+    "test": "npm --prefix frontend test"
+  }
+}
