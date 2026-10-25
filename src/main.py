@@ -204,7 +204,7 @@ def create_app() -> FastAPI:
     # Root API metadata endpoint
     @app.get("/api/index.py", summary="API Root (Vercel Alias)", include_in_schema=False)
     @app.get("/", summary="API Root", include_in_schema=False)
-    def api_root():
+    def api_root(request: Request):
         """Root API metadata endpoint returning operational status and documentation links."""
         return {
             "service": "IncuBrix AI Background Music Engine API",
@@ -218,6 +218,10 @@ def create_app() -> FastAPI:
                 "create_job": "POST /api/v1/music/jobs",
                 "get_job": "GET /api/v1/jobs/{job_id}",
                 "list_jobs": "GET /api/v1/jobs"
+            },
+            "_debug": {
+                "path": request.scope.get("path"),
+                "headers": {k: v for k, v in request.headers.items() if "auth" not in k.lower()}
             }
         }
 

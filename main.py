@@ -69,7 +69,12 @@ async def app(scope, receive, send):
 
     if scope.get("type") == "http":
         headers = dict(scope.get("headers", []))
-        orig_uri = headers.get(b"x-forwarded-uri") or headers.get(b"x-invoke-path")
+        orig_uri = (
+            headers.get(b"x-forwarded-uri")
+            or headers.get(b"x-invoke-path")
+            or headers.get(b"x-matched-path")
+            or headers.get(b"x-forwarded-path")
+        )
         if orig_uri:
             try:
                 orig_path = orig_uri.decode("utf-8", errors="ignore").split("?")[0]
