@@ -1,5 +1,5 @@
 # ==============================================================================
-# IncuBrix AI Background Music Engine — Application Dependencies
+# IncuBrix AI Background Music Engine — Production Application Dependencies
 # ==============================================================================
 
 # Core DSP & Audio Engineering
@@ -10,14 +10,13 @@ pyloudnorm>=0.1.1
 
 # FastAPI Gateway & ASGI Server
 fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
+uvicorn>=0.27.0
 starlette>=0.36.0
 
 # Database & ORM
 sqlalchemy>=2.0.25
 alembic>=1.13.1
 psycopg2-binary>=2.9.9
-psycopg[binary]>=3.1.18
 
 # Asynchronous Tasks & Message Broker
 celery>=5.3.6
@@ -35,8 +34,3 @@ python-dotenv>=1.0.0
 httpx>=0.25.0
 pyyaml>=6.0.1
 structlog>=24.1.0
-
-# Testing Framework & Quality Engineering
-pytest>=7.4.0
-pytest-asyncio>=0.23.0
-pytest-cov>=4.1.0

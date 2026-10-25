@@ -1,0 +1,41 @@
+# ==============================================================================
+# Vercel Deployment Ignore Rules
+# ==============================================================================
+
+# Heavy sample audio packs and offline verification assets
+sample_audio_packs/
+artifacts/
+storage_data/
+storage_data_test/
+
+# Automated test suites and vectors
+tests/
+test_inputs/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Presentation workbooks and confidential documents
+*.xlsx
+*.xls
+*.pdf
+docs/
+
+# Local databases and logs
+*.db
+*.sqlite3
+*.log
+
+# Containerization and other cloud platform specs
+Dockerfile
+docker-compose.yml
+render.yaml
+
+# Frontend files (when deploying backend function)
+frontend/
+node_modules/
+
+# Python compiled bytecode
+__pycache__/
+*.py[cod]
+*$py.class

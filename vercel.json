@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{sample_audio_packs/**,artifacts/**,storage_data/**,storage_data_test/**,tests/**,test_inputs/**,docs/**,frontend/**,scripts/**,*.xlsx,*.pdf,*.db,*.sqlite3,*.log}"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}
