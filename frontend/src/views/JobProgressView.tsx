@@ -48,7 +48,7 @@ export const JobProgressView: React.FC<JobProgressViewProps> = ({
       isSubscribed = false;
       if (timerId) clearTimeout(timerId);
     };
-  }, [jobId]);
+  }, [jobId, onComplete]);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(jobId);

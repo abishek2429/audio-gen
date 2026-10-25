@@ -14,10 +14,6 @@ export const JobHistoryView: React.FC<JobHistoryViewProps> = ({ onNavigate }) =>
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
   const fetchJobs = async () => {
     try {
       setLoading(true);
@@ -30,6 +26,27 @@ export const JobHistoryView: React.FC<JobHistoryViewProps> = ({ onNavigate }) =>
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    let ignore = false;
+    apiClient.listJobs(50).then(
+      (data) => {
+        if (!ignore) {
+          setJobs(data);
+          setLoading(false);
+        }
+      },
+      (err: any) => {
+        if (!ignore) {
+          setError(err.message || "Failed to load job history from backend");
+          setLoading(false);
+        }
+      }
+    );
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const filteredJobs = jobs.filter((j) => {
     const matchesStatus = statusFilter === "all" || j.status === statusFilter;
