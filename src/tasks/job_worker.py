@@ -9,7 +9,11 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 import numpy as np
-import soundfile as sf
+
+try:
+    import soundfile as sf
+except Exception:
+    sf = None
 
 from src.config import settings
 from src.database.session import SessionLocal

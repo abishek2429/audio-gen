@@ -6,9 +6,21 @@ import json
 import datetime
 from typing import Dict, Any, List
 import numpy as np
-import soundfile as sf
-import pyloudnorm as pyln
-from scipy.signal import resample_poly
+
+try:
+    import soundfile as sf
+except Exception:
+    sf = None
+
+try:
+    import pyloudnorm as pyln
+except Exception:
+    pyln = None
+
+try:
+    from scipy.signal import resample_poly
+except Exception:
+    resample_poly = None
 
 from src.models import ValidationReport, GateResult
 

@@ -4,6 +4,29 @@ from typing import Optional, Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _is_serverless_or_readonly() -> bool:
+    """Detect if running in Vercel, AWS Lambda, or a read-only filesystem."""
+    serverless_keys = (
+        "VERCEL",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "VERCEL_REGION",
+        "AWS_LAMBDA_FUNCTION_NAME",
+        "LAMBDA_TASK_ROOT",
+        "AWS_EXECUTION_ENV",
+    )
+    if any(k in os.environ for k in serverless_keys):
+        return True
+    try:
+        test_path = os.path.join(os.getcwd(), ".write_test")
+        with open(test_path, "w") as f:
+            f.write("1")
+        os.remove(test_path)
+        return False
+    except (OSError, PermissionError):
+        return True
+
+
 class Settings(BaseSettings):
     """Application and Provider settings loaded from environment variables."""
 
@@ -21,7 +44,7 @@ class Settings(BaseSettings):
     # Database Settings (PostgreSQL in container, SQLite locally or /tmp in Vercel)
     database_url: str = (
         "sqlite:////tmp/incubrix.db"
-        if ("VERCEL" in os.environ or "AWS_LAMBDA_FUNCTION_NAME" in os.environ)
+        if _is_serverless_or_readonly()
         else "sqlite:///./incubrix.db"
     )
 
@@ -40,7 +63,7 @@ class Settings(BaseSettings):
     minio_secure: bool = False
     local_storage_dir: str = (
         "/tmp/storage_data"
-        if ("VERCEL" in os.environ or "AWS_LAMBDA_FUNCTION_NAME" in os.environ)
+        if _is_serverless_or_readonly()
         else "./storage_data"
     )
 

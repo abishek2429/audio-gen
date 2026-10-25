@@ -31,7 +31,12 @@ class StorageService:
     def __init__(self):
         self.backend = settings.storage_backend
         self.local_dir = os.path.abspath(settings.local_storage_dir)
-        os.makedirs(self.local_dir, exist_ok=True)
+        try:
+            os.makedirs(self.local_dir, exist_ok=True)
+        except (OSError, PermissionError) as e:
+            logger.warning("Could not create local storage directory %s: %s; falling back to /tmp/storage_data", self.local_dir, e)
+            self.local_dir = "/tmp/storage_data"
+            os.makedirs(self.local_dir, exist_ok=True)
         self._minio_client: Optional[Minio] = None
 
         if self.backend == "minio":

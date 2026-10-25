@@ -10,7 +10,7 @@ import type {
   ErrorDetail,
 } from "../types/api";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://audio-gen-bay.vercel.app").replace(/\/+$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://audio-gen-two.vercel.app").replace(/\/+$/, "");
 
 export class ApiError extends Error {
   code: string;

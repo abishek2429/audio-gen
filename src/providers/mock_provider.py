@@ -11,7 +11,11 @@ import time
 import math
 from typing import Dict, Any, Optional, Tuple
 import numpy as np
-import soundfile as sf
+
+try:
+    import soundfile as sf
+except Exception:
+    sf = None
 
 from src.providers.base import (
     AudioProviderInterface,

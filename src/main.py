@@ -24,8 +24,11 @@ async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
     setup_structured_logging(settings.log_level)
     logger.info("Initializing IncuBrix AI Background Music Engine (v0.1.0)...")
-    init_db()
-    logger.info("Database schema initialized successfully.")
+    try:
+        init_db()
+        logger.info("Database schema initialized successfully.")
+    except Exception as e:
+        logger.warning("Database schema initialization encountered an error (continuing startup): %s", e)
     yield
     logger.info("IncuBrix AI Background Music Engine shutting down.")
 

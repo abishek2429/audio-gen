@@ -5,9 +5,20 @@ import io
 import math
 from typing import Dict, Tuple, Optional
 import numpy as np
-import soundfile as sf
-import pyloudnorm as pyln
-from scipy.signal import resample_poly
+try:
+    import soundfile as sf
+except Exception:
+    sf = None
+
+try:
+    import pyloudnorm as pyln
+except Exception:
+    pyln = None
+
+try:
+    from scipy.signal import resample_poly
+except Exception:
+    resample_poly = None
 
 
 def load_audio_from_bytes(data: bytes, target_sr: int = 48000) -> Tuple[np.ndarray, int]:
