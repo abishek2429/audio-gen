@@ -18,6 +18,13 @@ def configure_test_environment():
     settings.music_provider = "mock"
     settings.app_env = "testing"
     init_db()
+    yield
+    import shutil
+    if os.path.exists("./storage_data_test"):
+        try:
+            shutil.rmtree("./storage_data_test")
+        except Exception:
+            pass
 
 
 @pytest.fixture(autouse=True)
