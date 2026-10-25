@@ -10,7 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.config import settings
+from src.config import settings, _is_serverless_or_readonly
 from src.logging_config import setup_structured_logging, correlation_id_ctx
 from src.database.session import init_db
 from src.api.routes_jobs import router as jobs_router
@@ -44,7 +44,7 @@ def create_app() -> FastAPI:
         ),
         version="0.1.0",
         openapi_version="3.1.0",
-        lifespan=lifespan,
+        lifespan=lifespan if not _is_serverless_or_readonly() else None,
     )
 
     # CORS configuration
@@ -86,6 +86,8 @@ def create_app() -> FastAPI:
             "/",
             "/health",
             "/ready",
+            "/api/health",
+            "/api/ready",
             "/api/v1/health",
             "/api/v1/ready",
             "/docs",
@@ -225,3 +227,10 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+if _is_serverless_or_readonly():
+    setup_structured_logging(settings.log_level)
+    try:
+        init_db()
+    except Exception as e:
+        logger.warning("Serverless database auto-init skipped: %s", e)
