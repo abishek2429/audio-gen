@@ -32,6 +32,7 @@ artifacts/**/*.mp3
 *.pdf
 docs/submission_*
 docs/final_submission_audit.md
+docs/final_submission_answers.md
 docs/audit_report.md
 
 # Frontend dependencies and production build outputs
