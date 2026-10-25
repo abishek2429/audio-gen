@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Copy, Check, CheckCircle2, AlertTriangle, ArrowRight, RefreshCw } from "lucide-react";
+import { Copy, Check, CheckCircle2, AlertTriangle, ArrowRight, RefreshCw, Loader2 } from "lucide-react";
 import { apiClient } from "../services/apiClient";
 import type { JobStatusResponse } from "../types/api";
 
@@ -29,10 +29,9 @@ export const JobProgressView: React.FC<JobProgressViewProps> = ({
         setJob(data);
 
         if (data.status === "succeeded") {
-          // Auto-trigger completion after brief delay
           setTimeout(() => {
             if (isSubscribed) onComplete(jobId);
-          }, 1200);
+          }, 800);
         } else if (data.status !== "failed") {
           timerId = setTimeout(poll, 1000);
         }
@@ -70,162 +69,167 @@ export const JobProgressView: React.FC<JobProgressViewProps> = ({
   ];
 
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-      <div className="glass-panel" style={{ padding: "36px", textAlign: "center" }}>
-        {/* Job Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "16px" }}>
-          <span style={{ fontSize: "0.85rem", color: "var(--text-dim)" }}>Job Identifier:</span>
-          <span className="font-mono" style={{ fontWeight: 700, color: "var(--accent-secondary)" }}>
+    <div className="panel" style={{ padding: "28px", maxWidth: "680px", margin: "0 auto" }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Job ID:</span>
+          <span className="font-mono" style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--accent-text)" }}>
             {jobId}
           </span>
           <button
             onClick={handleCopyId}
-            style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex" }}
+            style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex", padding: "2px" }}
             title="Copy Job ID"
             aria-label="Copy Job ID"
           >
-            {copied ? <Check size={16} color="var(--success)" /> : <Copy size={16} />}
+            {copied ? <Check size={14} color="var(--success)" /> : <Copy size={14} />}
           </button>
         </div>
 
-        {/* Status Title */}
-        <h2 style={{ fontSize: "1.8rem", fontWeight: 800, marginBottom: "8px" }}>
-          {status === "queued" && "Job Queued"}
-          {status === "running" && "Synthesizing Audio..."}
-          {status === "succeeded" && "Audio Generation Complete!"}
-          {status === "failed" && "Processing Failed"}
-        </h2>
+        <span
+          className={`badge ${
+            status === "succeeded"
+              ? "badge-success"
+              : status === "failed"
+              ? "badge-danger"
+              : "badge-neutral"
+          }`}
+        >
+          {status}
+        </span>
+      </div>
 
-        <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", marginBottom: "28px" }}>
-          {status === "queued" && "Waiting for audio worker pick-up..."}
-          {status === "running" && "Executing multi-stage neural synthesis, stem separation, and 48 kHz finishing."}
-          {status === "succeeded" && "All quality gates verified. Your mix and stems are ready."}
-          {status === "failed" && "An error occurred during audio generation."}
-        </p>
+      {/* Title */}
+      <h2 style={{ fontSize: "1.3rem", fontWeight: 700, marginBottom: "6px" }}>
+        {status === "queued" && "Queued for Synthesis"}
+        {status === "running" && "Synthesizing Instrumental Audio"}
+        {status === "succeeded" && "Audio Generation Complete"}
+        {status === "failed" && "Processing Failed"}
+      </h2>
 
-        {pollingError && (
-          <div style={{ color: "var(--warning)", fontSize: "0.8rem", marginBottom: "16px" }}>
-            Reconnecting to audio engine... ({pollingError})
-          </div>
-        )}
+      <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "24px" }}>
+        {status === "queued" && "Waiting for audio worker to allocate synthesis slot..."}
+        {status === "running" && "Generating instrumental tracks, isolating stems, and applying ITU-R BS.1770-4 normalization."}
+        {status === "succeeded" && "All stems and master mix have been packaged and verified."}
+        {status === "failed" && "The audio worker was unable to complete this generation."}
+      </p>
 
-        {/* Progress Bar */}
-        <div style={{ marginBottom: "32px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", fontWeight: 600, marginBottom: "8px" }}>
-            <span style={{ color: "var(--text-muted)" }}>Progress</span>
-            <span className="font-mono" style={{ color: "var(--accent-primary)" }}>
-              {progress}%
-            </span>
-          </div>
+      {pollingError && (
+        <div style={{ color: "var(--warning)", fontSize: "0.78rem", marginBottom: "14px" }}>
+          Reconnecting to backend service... ({pollingError})
+        </div>
+      )}
+
+      {/* Progress Bar */}
+      <div style={{ marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", fontWeight: 600, marginBottom: "6px" }}>
+          <span style={{ color: "var(--text-muted)" }}>Progress</span>
+          <span className="font-mono" style={{ color: "var(--accent-text)" }}>
+            {progress}%
+          </span>
+        </div>
+        <div
+          style={{
+            height: "6px",
+            background: "var(--bg-canvas)",
+            borderRadius: "var(--radius-full)",
+            overflow: "hidden",
+            border: "1px solid var(--border-subtle)",
+          }}
+        >
           <div
             style={{
-              height: "10px",
-              background: "rgba(255, 255, 255, 0.08)",
-              borderRadius: "var(--radius-full)",
-              overflow: "hidden",
+              height: "100%",
+              width: `${progress}%`,
+              background: status === "failed" ? "var(--danger)" : "var(--accent-primary)",
+              transition: "width 0.3s ease",
             }}
-          >
-            <div
-              style={{
-                height: "100%",
-                width: `${progress}%`,
-                background:
-                  status === "failed"
-                    ? "var(--danger)"
-                    : "var(--accent-gradient)",
-                transition: "width 0.4s ease",
-              }}
-            />
-          </div>
+          />
         </div>
+      </div>
 
-        {/* Step Progression Checkpoints */}
-        <div style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
-          {steps.map((st, idx) => {
-            const isDone = progress >= st.threshold;
-            const isCurrent = progress < st.threshold && (idx === 0 || progress >= steps[idx - 1].threshold);
-            return (
-              <div
-                key={idx}
+      {/* Steps List */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
+        {steps.map((st, idx) => {
+          const isDone = progress >= st.threshold;
+          const isCurrent = progress < st.threshold && (idx === 0 || progress >= steps[idx - 1].threshold);
+          return (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "8px 12px",
+                background: isCurrent ? "var(--accent-subtle)" : "var(--bg-panel-subtle)",
+                border: `1px solid ${isCurrent ? "var(--border-accent)" : "var(--border-subtle)"}`,
+                borderRadius: "var(--radius-sm)",
+              }}
+            >
+              {isDone ? (
+                <CheckCircle2 size={15} color="var(--success)" style={{ flexShrink: 0 }} />
+              ) : isCurrent ? (
+                <Loader2 size={15} color="var(--accent-text)" className="animate-spin" style={{ flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--text-muted)", flexShrink: 0 }} />
+              )}
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "10px 14px",
-                  background: isCurrent ? "rgba(139, 92, 246, 0.1)" : "rgba(255, 255, 255, 0.02)",
-                  border: `1px solid ${isCurrent ? "rgba(139, 92, 246, 0.3)" : "var(--border-subtle)"}`,
-                  borderRadius: "var(--radius-md)",
-                  transition: "all 0.2s ease",
+                  fontSize: "0.82rem",
+                  fontWeight: isCurrent || isDone ? 600 : 400,
+                  color: isDone ? "var(--text-primary)" : isCurrent ? "var(--accent-text)" : "var(--text-muted)",
                 }}
               >
-                {isDone ? (
-                  <CheckCircle2 size={18} color="var(--success)" />
-                ) : isCurrent ? (
-                  <div className="animate-spin" style={{ width: "18px", height: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    ⏳
-                  </div>
-                ) : (
-                  <div style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2px solid var(--text-dim)" }} />
-                )}
-                <span
-                  style={{
-                    fontSize: "0.85rem",
-                    fontWeight: isCurrent || isDone ? 600 : 400,
-                    color: isDone ? "var(--text-main)" : isCurrent ? "var(--accent-secondary)" : "var(--text-dim)",
-                  }}
-                >
-                  {st.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Failure Details */}
-        {status === "failed" && job?.error && (
-          <div
-            style={{
-              padding: "16px",
-              background: "rgba(239, 68, 68, 0.12)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
-              borderRadius: "var(--radius-md)",
-              color: "var(--danger)",
-              textAlign: "left",
-              marginBottom: "24px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 700, marginBottom: "4px" }}>
-              <AlertTriangle size={18} />
-              <span>
-                {typeof job.error === "string"
-                  ? job.error
-                  : `[${job.error.code}] ${job.error.message}`}
+                {st.label}
               </span>
             </div>
-            {typeof job.error !== "string" && job.error.details && (
-              <pre className="font-mono" style={{ fontSize: "0.75rem", background: "rgba(0,0,0,0.3)", padding: "8px", borderRadius: "4px", overflowX: "auto" }}>
-                {JSON.stringify(job.error.details, null, 2)}
-              </pre>
-            )}
+          );
+        })}
+      </div>
+
+      {/* Error Details */}
+      {status === "failed" && job?.error && (
+        <div
+          style={{
+            padding: "12px 14px",
+            background: "var(--danger-subtle)",
+            border: "1px solid rgba(239, 68, 68, 0.25)",
+            borderRadius: "var(--radius-md)",
+            color: "var(--danger)",
+            fontSize: "0.82rem",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 600, marginBottom: "4px" }}>
+            <AlertTriangle size={15} />
+            <span>
+              {typeof job.error === "string" ? job.error : `[${job.error.code}] ${job.error.message}`}
+            </span>
           </div>
-        )}
-
-        {/* Action Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", gap: "14px" }}>
-          {status === "succeeded" && (
-            <button onClick={() => onComplete(jobId)} className="btn btn-primary" style={{ padding: "12px 28px" }}>
-              <span>Open in Audio Studio</span>
-              <ArrowRight size={18} />
-            </button>
-          )}
-
-          {status === "failed" && (
-            <button onClick={onRetry} className="btn btn-secondary">
-              <RefreshCw size={16} />
-              <span>Create New Request</span>
-            </button>
+          {typeof job.error !== "string" && job.error.details && Object.keys(job.error.details).length > 0 && (
+            <pre className="font-mono" style={{ fontSize: "0.72rem", background: "rgba(0,0,0,0.25)", padding: "6px", borderRadius: "4px", overflowX: "auto", marginTop: "4px" }}>
+              {JSON.stringify(job.error.details, null, 2)}
+            </pre>
           )}
         </div>
+      )}
+
+      {/* Actions */}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+        {status === "succeeded" && (
+          <button onClick={() => onComplete(jobId)} className="btn btn-primary">
+            <span>Open in Audio Studio</span>
+            <ArrowRight size={14} />
+          </button>
+        )}
+
+        {status === "failed" && (
+          <button onClick={onRetry} className="btn btn-secondary">
+            <RefreshCw size={14} />
+            <span>Try Again</span>
+          </button>
+        )}
       </div>
     </div>
   );

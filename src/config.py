@@ -1,4 +1,5 @@
 """Configuration management for IncuBrix AI Background Music Engine."""
+import os
 from typing import Optional, Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -17,8 +18,12 @@ class Settings(BaseSettings):
     elevenlabs_api_key: Optional[str] = None
     elevenlabs_base_url: str = "https://api.elevenlabs.io"
 
-    # Database Settings (PostgreSQL in container, SQLite locally)
-    database_url: str = "sqlite:///./incubrix.db"
+    # Database Settings (PostgreSQL in container, SQLite locally or /tmp in Vercel)
+    database_url: str = (
+        "sqlite:////tmp/incubrix.db"
+        if ("VERCEL" in os.environ or "AWS_LAMBDA_FUNCTION_NAME" in os.environ)
+        else "sqlite:///./incubrix.db"
+    )
 
     # Redis and Celery Settings
     redis_url: str = "redis://localhost:6379/0"
@@ -33,7 +38,11 @@ class Settings(BaseSettings):
     minio_secret_key: str = "minioadmin"
     minio_bucket: str = "incubrix-audio"
     minio_secure: bool = False
-    local_storage_dir: str = "./storage_data"
+    local_storage_dir: str = (
+        "/tmp/storage_data"
+        if ("VERCEL" in os.environ or "AWS_LAMBDA_FUNCTION_NAME" in os.environ)
+        else "./storage_data"
+    )
 
     # Security & Webhook Callback Settings
     callback_secret: str = "incubrix-default-hmac-secret-change-in-prod"
