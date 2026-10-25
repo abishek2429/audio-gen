@@ -232,7 +232,3 @@ app = create_app()
 
 if _is_serverless_or_readonly():
     setup_structured_logging(settings.log_level)
-    try:
-        init_db()
-    except Exception as e:
-        logger.warning("Serverless database auto-init skipped: %s", e)

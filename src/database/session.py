@@ -17,7 +17,7 @@ connect_args = {}
 if db_url.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 elif "postgres" in db_url:
-    connect_args["connect_timeout"] = 5
+    connect_args["connect_timeout"] = 2
 
 engine = create_engine(
     db_url,
@@ -27,6 +27,8 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+_db_initialized = False
+
 
 def get_engine():
     """Return the global SQLAlchemy engine."""
@@ -34,12 +36,23 @@ def get_engine():
 
 
 def init_db():
-    """Initialize database tables."""
-    Base.metadata.create_all(bind=engine)
+    """Initialize database tables idempotently."""
+    global _db_initialized
+    if _db_initialized:
+        return
+    try:
+        Base.metadata.create_all(bind=engine)
+        _db_initialized = True
+    except Exception as exc:
+        if _is_serverless_or_readonly():
+            pass
+        else:
+            raise exc
 
 
 def get_db() -> Generator[Session, None, None]:
     """FastAPI dependency yielding a database session."""
+    init_db()
     db = SessionLocal()
     try:
         yield db
