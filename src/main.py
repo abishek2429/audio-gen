@@ -80,6 +80,7 @@ def create_app() -> FastAPI:
 
         # 2. Demo access protection (when DEMO_API_KEY is configured)
         public_paths = {
+            "/",
             "/health",
             "/ready",
             "/api/v1/health",
@@ -193,6 +194,25 @@ def create_app() -> FastAPI:
                 }
             },
         )
+
+    # Root API metadata endpoint
+    @app.get("/", summary="API Root", include_in_schema=False)
+    def api_root():
+        """Root API metadata endpoint returning operational status and documentation links."""
+        return {
+            "service": "IncuBrix AI Background Music Engine API",
+            "version": "0.1.0",
+            "status": "online",
+            "documentation": "/docs",
+            "openapi": "/openapi.json",
+            "health": "/health",
+            "ready": "/ready",
+            "endpoints": {
+                "create_job": "POST /api/v1/music/jobs",
+                "get_job": "GET /api/v1/jobs/{job_id}",
+                "list_jobs": "GET /api/v1/jobs"
+            }
+        }
 
     # Register Routers
     app.include_router(health_router)
