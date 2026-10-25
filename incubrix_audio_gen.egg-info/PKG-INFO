@@ -1,0 +1,204 @@
+Metadata-Version: 2.4
+Name: incubrix-audio-gen
+Version: 0.1.0
+Summary: IncuBrix AI Background Music Engine - Audio Proof of Concept
+Author: IncuBrix AI Audio Engineer
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: scipy>=1.11.0
+Requires-Dist: soundfile>=0.12.0
+Requires-Dist: pyloudnorm>=0.1.1
+Requires-Dist: fastapi>=0.109.0
+Requires-Dist: uvicorn[standard]>=0.27.0
+Requires-Dist: starlette>=0.36.0
+Requires-Dist: sqlalchemy>=2.0.25
+Requires-Dist: alembic>=1.13.1
+Requires-Dist: psycopg2-binary>=2.9.9
+Requires-Dist: celery>=5.3.6
+Requires-Dist: redis>=5.0.1
+Requires-Dist: minio>=7.2.0
+Requires-Dist: pydantic>=2.7.0
+Requires-Dist: pydantic-settings>=2.1.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: structlog>=24.1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Dynamic: license-file
+
+# IncuBrix AI Background Music Engine for Video
+
+Original, commercially safe instrumental music that fits a video exactly — with real instrument stems, sample-accurate duration alignment, and ITU-R BS.1770-4 loudness compliance.
+
+---
+
+## 1. System Architecture
+
+```
+                             +-------------------------------+
+                             |    IncuBrix Video Creator     |
+                             |   (Client / Video Editor)     |
+                             +-------------------------------+
+                                             |
+                                             | HTTP POST /api/v1/music/jobs
+                                             v
+                       +---------------------------------------------+
+                       |               FastAPI Gateway               |
+                       |  - Validates OpenAPI 3.1 Request Payload    |
+                       |  - Enforces Idempotency-Key Header          |
+                       |  - Blocks SSRF against Private/Internal IPs |
+                       |  - Rate Limiting (60 req/min per IP)        |
+                       |  - Request Body Caps (Max 50 MB)            |
+                       |  - Demo Access Protection (DEMO_API_KEY)    |
+                       |  - Emits Structured JSON Logs + Correlation |
+                       |  - Returns HTTP 202 Accepted + job_id       |
+                       +---------------------------------------------+
+                                             |
+                        +--------------------+--------------------+
+                        | (In-process Queue)                      | (Celery Queue)
+                        v                                         v
+         +-----------------------------+           +-----------------------------+
+         |     Async Worker Thread     |           |     Celery Audio Worker     |
+         +-----------------------------+           +-----------------------------+
+                        \                                         /
+                         \                                       /
+                          v                                     v
+                       +---------------------------------------------+
+                       |              Audio Generation               |
+                       |  - Soundverse Enterprise (v7 Demucs 6-stem) |
+                       |  - ElevenLabs Music API (music_v2)          |
+                       |  - Mock Provider (Offline Synthetic Audio)  |
+                       +---------------------------------------------+
+                                             |
+                                             v
+                       +---------------------------------------------+
+                       |          Local DSP & Audio Engine           |
+                       |  - 48 kHz 24-bit PCM WAV Transcoding        |
+                       |  - Sample-Accurate Duration (|Δt| <= 0.05s) |
+                       |  - Cosine Musical Tail (No Truncation Pops) |
+                       |  - ITU-R BS.1770-4 Loudness (-16 LUFS)      |
+                       |  - True Peak Limiting (<= -1.0 dBTP)        |
+                       |  - Voiceover Sidechain Ducking (-10 dB)     |
+                       |  - Mathematical Stem Reconstruction (SDR)   |
+                       +---------------------------------------------+
+                                             |
+                                             v
+                       +---------------------------------------------+
+                       |        MinIO S3 / Object Storage            |
+                       |  - mix.wav, mix.mp3                         |
+                       |  - stems/drums.wav, bass.wav, harmony...    |
+                       |  - mix_ducked.wav (when voiceover provided) |
+                       |  - music_manifest.json                      |
+                       |  - validation_report.json                   |
+                       +---------------------------------------------+
+                                             |
+                                             v
+                       +---------------------------------------------+
+                       |       HMAC-SHA256 Webhook Callback          |
+                       |  (Signed with X-IncuBrix-Signature header)  |
+                       +---------------------------------------------+
+```
+
+---
+
+## 2. Quickstart Setup (Under 10 Commands)
+
+### Option A: Local Development & Automated Test Execution (Zero External Keys Required)
+
+```bash
+# 1. Clone repository
+git clone <repo-url> && cd audio-gen
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run full automated test suite (67 tests, 100% offline)
+pytest tests/ -v
+
+# 4. Start FastAPI development server
+uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+# 5. In a separate terminal, run frontend dashboard
+cd frontend && npm install && npm run dev -- --port 3000
+```
+
+### Option B: One-Command Docker Compose Deployment
+
+```bash
+# 1. Copy environment template
+cp .env.example .env
+
+# 2. Build and launch all 6 services (Frontend, FastAPI, Celery, PostgreSQL, Redis, MinIO)
+docker compose up --build
+
+# 3. Access interfaces:
+# - Web Dashboard (Audio Studio): http://localhost:3000
+# - API Interactive Docs (OpenAPI): http://localhost:8000/docs
+# - MinIO S3 Console: http://localhost:9001 (User/Pass: minioadmin / minioadmin)
+```
+
+---
+
+## 3. Automated Batch Test Runner
+
+Execute reproducible end-to-end API validations, download outputs, and run independent DSP verification:
+
+```bash
+python scripts/batch_runner.py --inputs-dir test_inputs --api-url http://localhost:8000 --output-dir artifacts/test_results
+```
+
+The runner:
+1. Submits all JSON test vectors from `test_inputs/`.
+2. Polls asynchronous jobs until terminal status (`succeeded` or `failed`).
+3. Downloads all generated assets (`mix.wav`, `stems/*.wav`, `music_manifest.json`).
+4. Runs independent ITU-R BS.1770-4 loudness, True Peak, duration, and SDR validation.
+5. Emits consolidated results in `artifacts/test_results/test_summary.md` (**15 / 15 Passed**).
+
+---
+
+## 4. Key Empirical Benchmark Metrics
+
+Obtained via [`scripts/measure_benchmarks.py`](file:///c:/audio-gen/scripts/measure_benchmarks.py) on a 60-second reference track:
+
+| Benchmark Metric | Measured Result | Evaluation Gate |
+| :--- | :---: | :---: |
+| **Cold Start Generation (60s Track)** | **10.89s** | Sub-15s startup |
+| **Warm API Roundtrip (60s Track)** | **12.12s** (Worker elapsed: 2.15s) | Sub-15s response |
+| **Maximum Duration Error** | **0.0000s** (0 samples drift) | Target $\pm 0.05$s |
+| **Integrated Loudness** | **-16.00 LUFS** | Target $-16.0 \pm 1.0$ LU |
+| **4x Oversampled True Peak** | **-3.09 dBTP** | Ceiling $\le -1.0$ dBTP |
+| **Stem Reconstruction SDR** | **114.38 dB** | Minimum $\ge 20.0$ dB |
+| **Max Stem Inter-Correlation (Leakage)** | **0.009** | Differentiated instruments |
+| **Concurrency (5 Parallel Jobs)** | **100.0% Success (5/5)** | No race conditions |
+| **Automated Test Suite Pass Rate** | **67 / 67 Passed (100%)** | 0 Failures |
+
+---
+
+## 5. API Reference & OpenAPI 3.1 Specification
+
+Root OpenAPI documentation is maintained at [`openapi.yaml`](file:///c:/audio-gen/openapi.yaml) and served live at `/docs`.
+
+### Core Endpoints
+
+* `POST /api/v1/music/jobs` — Submit asynchronous music generation job. Requires `Idempotency-Key` header. Returns HTTP 202 with `job_id`.
+* `GET /api/v1/jobs/{job_id}` — Poll job state, progress percentage (0–100), timing metrics, and asset download URLs.
+* `GET /api/v1/jobs` — Paginated history of generated jobs.
+* `GET /health` — Liveness probe (`{"status": "ok"}`).
+* `GET /ready` — Readiness probe verifying database and storage connectivity.
+
+---
+
+## 6. Technical Documentation & Quality Reports
+
+* [`REPORT.md`](file:///c:/audio-gen/REPORT.md) — Systems engineering verification, signal quality analysis, and benchmark report.
+* [`SOURCES.md`](file:///c:/audio-gen/SOURCES.md) — External APIs, audio models, open-source libraries, and commercial licensing audit.
+* [`AI_USE.md`](file:///c:/audio-gen/AI_USE.md) — Engineering tooling and architecture provenance documentation.
+* [`docs/hard_case_results.md`](file:///c:/audio-gen/docs/hard_case_results.md) — Edge-case verification matrix and boundary defenses audit.
+* [`docs/integration_compliance.md`](file:///c:/audio-gen/docs/integration_compliance.md) — Enterprise integration compliance matrix.
+* [`docs/deployment_guide.md`](file:///c:/audio-gen/docs/deployment_guide.md) — Production deployment architecture, Render blueprint, and security controls.
+* [`artifacts/test_results/evidence_index.md`](file:///c:/audio-gen/artifacts/test_results/evidence_index.md) — Empirical evidence index for all test vectors and preserved outputs.
