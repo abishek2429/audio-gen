@@ -163,3 +163,10 @@ In compliance with the project rule:
    - Push backend image to AWS ECR: `docker build -t <account>.dkr.ecr.<region>.amazonaws.com/incubrix-engine:latest .`
    - Create ECS Task Definition mapping API container (port 8000) and Worker container to AWS RDS PostgreSQL and AWS ElastiCache Redis.
    - Attach Application Load Balancer (ALB) with ACM HTTPS certificate.
+
+3. **Option C — Vercel Fullstack Deployment (Vite Studio + Serverless Functions):**
+   - Connect the repository to [Vercel](https://vercel.com).
+   - Vercel automatically detects `vercel.json` and root `package.json`.
+   - The React audio workstation builds via `npm run build` into `frontend/dist`.
+   - The FastAPI backend runs via `api/index.py` serverless functions with `excludeFiles` to ensure the Lambda bundle remains ~226 MB (well within the 500 MB limit).
+   - Configure environment variables in Vercel Dashboard (e.g. `DATABASE_URL`, `STORAGE_BACKEND`, `SOUNDVERSE_API_KEY`).
