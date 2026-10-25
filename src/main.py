@@ -43,9 +43,9 @@ def create_app() -> FastAPI:
             "ITU-R BS.1770-4 loudness compliance, and voiceover sidechain ducking."
         ),
         version="0.1.0",
-        openapi_version="3.1.0",
         lifespan=lifespan if not _is_serverless_or_readonly() else None,
     )
+    app.openapi_version = "3.1.0"
 
     # CORS configuration
     app.add_middleware(
