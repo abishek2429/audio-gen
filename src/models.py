@@ -224,3 +224,57 @@ class VideoJobAcceptedResponse(JobAcceptedResponse):
     plan: Optional[MusicPlanResponse] = None
     video_metadata: Optional[VideoMetadataResponse] = None
 
+
+class ProviderTestRequest(BaseModel):
+    """Request payload to test provider authentication and optional sample generation."""
+    model_config = ConfigDict(extra="forbid")
+    provider: Optional[str] = Field(
+        default=None,
+        description="Provider name ('stable_audio', 'replicate', 'soundverse', 'elevenlabs', 'mock', 'auto'). If omitted, uses current configured settings.music_provider.",
+    )
+    perform_sample_generation: bool = Field(
+        default=False,
+        description="Whether to execute a live test generation (consumes credits/cost when provider is external).",
+    )
+    prompt: Optional[str] = Field(
+        default="Warm acoustic guitar and ambient strings instrumental background music",
+        description="Prompt for sample test generation.",
+    )
+    duration_s: float = Field(
+        default=5.0,
+        ge=3.0,
+        le=30.0,
+        description="Duration in seconds for test generation (default: 5.0).",
+    )
+
+
+class ProviderTestSampleResult(BaseModel):
+    """Metrics from a short sample generation."""
+    duration_s: float
+    format: str
+    sample_rate: int
+    cost_usd: float
+    credits_consumed: Optional[float] = None
+    latency_s: float
+    sample_audio_size_bytes: int
+    provider_raw_metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class ProviderTestResponse(BaseModel):
+    """Provider verification, authentication check, quota status, and test generation result."""
+    provider: str
+    authenticated: bool
+    status: str  # "ok", "unauthenticated", "quota_exhausted", "error"
+    credits_balance: Optional[float] = None
+    cost_per_run_usd: Optional[float] = None
+    free_trial_available: bool
+    free_trial_details: str
+    commercial_use_allowed: bool
+    license_type: str
+    max_duration_s: float
+    output_formats: List[str]
+    sample_generation: Optional[ProviderTestSampleResult] = None
+    limitations: List[str]
+    message: str
+
+

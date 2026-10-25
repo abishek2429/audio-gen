@@ -90,4 +90,12 @@ class StemSeparatorInterface(ABC):
 
 class AudioProviderInterface(MusicGeneratorInterface, StemSeparatorInterface, ABC):
     """Combined provider capable of both generation and stem separation."""
-    pass
+
+    def check_connection_and_balance(self) -> Dict[str, Any]:
+        """Verify provider authentication and query available balance or quota."""
+        return {
+            "provider": getattr(self, "provider_name", "unknown"),
+            "authenticated": True,
+            "message": "Connection check not specifically implemented for this provider.",
+        }
+

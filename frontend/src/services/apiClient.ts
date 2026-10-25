@@ -10,7 +10,10 @@ import type {
   ErrorDetail,
   VideoAnalysisResponse,
   VideoJobAcceptedResponse,
+  ProviderTestResponse,
+  ProviderComparisonResponse,
 } from "../types/api";
+
 
 const DEFAULT_API_URL = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -146,8 +149,33 @@ export const apiClient = {
     });
     return handleResponse<VideoJobAcceptedResponse>(res);
   },
+
+  async testProviderConnection(
+    provider?: string,
+    performSampleGeneration = false,
+    prompt?: string,
+    durationS = 5.0
+  ): Promise<ProviderTestResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/providers/test-connection`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        provider,
+        perform_sample_generation: performSampleGeneration,
+        prompt,
+        duration_s: durationS,
+      }),
+    });
+    return handleResponse<ProviderTestResponse>(res);
+  },
+
+  async getProviderComparison(): Promise<ProviderComparisonResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/v1/providers/comparison`);
+    return handleResponse<ProviderComparisonResponse>(res);
+  },
 };
 
 function jsonStringifyCanonical(obj: any): string {
   return JSON.stringify(obj);
 }
+

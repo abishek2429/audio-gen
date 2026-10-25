@@ -30,8 +30,16 @@ def _is_serverless_or_readonly() -> bool:
 class Settings(BaseSettings):
     """Application and Provider settings loaded from environment variables."""
 
-    # Active Provider: 'mock', 'soundverse', or 'elevenlabs'
-    music_provider: Literal["mock", "soundverse", "elevenlabs"] = "mock"
+    # Active Provider: 'mock', 'soundverse', 'elevenlabs', 'stable_audio', or 'replicate'
+    music_provider: Literal["mock", "soundverse", "elevenlabs", "stable_audio", "replicate"] = "mock"
+
+    # Stability AI (Stable Audio) Settings
+    stability_api_key: Optional[str] = None
+    stability_base_url: str = "https://api.stability.ai"
+    stability_model: str = "stable-audio-3"
+
+    # Replicate (Meta MusicGen) Settings
+    replicate_api_token: Optional[str] = None
 
     # Soundverse Settings
     soundverse_api_key: Optional[str] = None

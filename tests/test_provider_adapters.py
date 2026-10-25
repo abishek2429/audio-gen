@@ -31,8 +31,15 @@ def test_get_provider_factory():
     el_p = get_provider("elevenlabs")
     assert el_p.provider_name == "elevenlabs"
 
+    sa_p = get_provider("stable_audio")
+    assert sa_p.provider_name == "stable_audio"
+
+    rep_p = get_provider("replicate")
+    assert rep_p.provider_name == "replicate"
+
     with pytest.raises(ValueError, match="Unsupported provider"):
         get_provider("invalid_provider_name")
+
 
 
 def test_elevenlabs_mocked_network(monkeypatch):

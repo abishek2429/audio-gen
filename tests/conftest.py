@@ -16,7 +16,9 @@ def configure_test_environment():
     settings.storage_backend = "local"
     settings.local_storage_dir = "./storage_data_test"
     settings.music_provider = "mock"
+    settings.rate_limit_per_minute = 0
     init_db()
+
 
 
 @pytest.fixture

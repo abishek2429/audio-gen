@@ -290,26 +290,89 @@ def run_pipeline(
     }
 
 
+def test_provider_mode(provider_name: str, sample_generation: bool = True) -> int:
+    """Run interactive or automated CLI test for a music provider."""
+    print("=" * 65)
+    print(f"Testing Music Generation Provider: {provider_name.upper()}")
+    print("=" * 65)
+    try:
+        provider = get_provider(provider_name)
+    except Exception as e:
+        print(f"[ERROR] Failed to initialize provider '{provider_name}': {e}", file=sys.stderr)
+        return 1
+
+    print(f"Provider: {provider.provider_name}")
+    print(f"Model Version: {getattr(provider, 'model_version', 'N/A')}")
+    print(f"Cost per generation: ${getattr(provider, 'cost_per_generation', 0.0):.2f}")
+
+    print("\nChecking authentication and account balance...")
+    try:
+        balance_info = provider.check_connection_and_balance()
+        print(f"[OK] Authentication: {'SUCCESS' if balance_info.get('authenticated') else 'FAILED'}")
+        if "credits_balance" in balance_info:
+            print(f"     Credits Balance: {balance_info['credits_balance']}")
+            print(f"     Generations Remaining: {balance_info.get('generations_remaining')}")
+        if "notice" in balance_info:
+            print(f"     Notice: {balance_info['notice']}")
+    except Exception as e:
+        print(f"[FAILED] Authentication/Balance query failed: {e}")
+        return 1
+
+    if sample_generation:
+        print("\nExecuting short sample generation (5 seconds test)...")
+        t0 = time.time()
+        try:
+            res = provider.generate_music(
+                prompt="Warm acoustic guitar and ambient strings instrumental background music",
+                duration_s=5.0,
+            )
+            elapsed = time.time() - t0
+            print(f"[OK] Generation successful in {elapsed:.2f} seconds!")
+            print(f"     Rendered duration: {res.duration_s:.2f}s")
+            print(f"     Sample Rate: {res.sample_rate} Hz | Format: {res.format.upper()}")
+            print(f"     Audio Size: {len(res.audio_bytes)} bytes")
+            print(f"     Cost: ${res.cost_usd:.4f}")
+        except Exception as e:
+            print(f"[FAILED] Sample generation failed: {e}")
+            return 1
+
+    print("\n" + "=" * 65)
+    print("PROVIDER VERIFICATION: PASSED")
+    print("=" * 65)
+    return 0
+
+
 def main():
     """CLI Entry point."""
     parser = argparse.ArgumentParser(
         description="IncuBrix AI Background Music Engine — Audio Generation & DSP Pipeline"
     )
-    parser.add_argument("--prompt", type=str, required=True, help="Music description prompt")
-    parser.add_argument("--duration", type=float, required=True, help="Target duration in seconds (5-300)")
+    parser.add_argument("--prompt", type=str, default="Instrumental background music", help="Music description prompt")
+    parser.add_argument("--duration", type=float, default=15.0, help="Target duration in seconds (5-300)")
     parser.add_argument("--tempo", type=int, default=None, help="Optional tempo in BPM")
     parser.add_argument("--key", type=str, default=None, help="Optional musical key (e.g., 'C major')")
     parser.add_argument("--seed", type=int, default=None, help="Optional random seed")
-    parser.add_argument("--output-dir", type=str, required=True, help="Output directory to save assets")
+    parser.add_argument("--output-dir", type=str, default=None, help="Output directory to save assets")
     parser.add_argument(
         "--provider",
         type=str,
         default="auto",
-        choices=["auto", "mock", "soundverse", "elevenlabs"],
+        choices=["auto", "mock", "stable_audio", "replicate", "soundverse", "elevenlabs"],
         help="Audio generation provider (default: auto)",
+    )
+    parser.add_argument(
+        "--test-provider",
+        action="store_true",
+        help="Test provider authentication, quota, and perform a short 5-second generation test",
     )
 
     args = parser.parse_args()
+
+    if args.test_provider:
+        sys.exit(test_provider_mode(args.provider, sample_generation=True))
+
+    if not args.output_dir:
+        parser.error("--output-dir is required when running the generation pipeline.")
 
     try:
         run_pipeline(
@@ -328,3 +391,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

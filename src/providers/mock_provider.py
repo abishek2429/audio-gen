@@ -368,3 +368,17 @@ class MockProvider(AudioProviderInterface):
                 "stem_count": len(encoded_stems),
             },
         )
+
+    def check_connection_and_balance(self) -> Dict[str, Any]:
+        """Verify mock provider connection status (always authenticated and zero-cost)."""
+        return {
+            "provider": self.provider_name,
+            "authenticated": True,
+            "model_version": self.model_version,
+            "credits_balance": float("inf"),
+            "cost_per_generation_credits": 0,
+            "generations_remaining": 999999,
+            "has_sufficient_quota": True,
+            "notice": "Mock procedural provider runs completely offline with zero API calls, deterministic repeatability, and zero cost.",
+        }
+

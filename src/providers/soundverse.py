@@ -218,3 +218,29 @@ class SoundverseAdapter(AudioProviderInterface):
                 "stems_count": len(downloaded_stems),
             },
         )
+
+    def check_connection_and_balance(self) -> Dict[str, Any]:
+        """Verify Soundverse API key and query account details."""
+        headers = self._get_headers()
+        url = f"{self.base_url}/v1/user/credits"
+        with httpx.Client(timeout=15.0) as client:
+            try:
+                resp = client.get(url, headers=headers)
+            except Exception as exc:
+                return {
+                    "provider": self.provider_name,
+                    "authenticated": False,
+                    "error": f"Failed to connect to Soundverse: {exc}",
+                }
+            if resp.status_code == 401:
+                return {
+                    "provider": self.provider_name,
+                    "authenticated": False,
+                    "error": "Invalid Soundverse API key (401 Unauthorized)",
+                }
+            return {
+                "provider": self.provider_name,
+                "authenticated": resp.status_code == 200,
+                "notice": "Soundverse offers 10 trial credits upon signup ($0.07-$0.11/track generation).",
+            }
+

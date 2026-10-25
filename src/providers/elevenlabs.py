@@ -149,3 +149,39 @@ class ElevenLabsAdapter(AudioProviderInterface):
                 "stems_extracted": list(stems.keys()),
             },
         )
+
+    def check_connection_and_balance(self) -> Dict[str, Any]:
+        """Verify ElevenLabs API key and query subscription status."""
+        headers = self._get_headers()
+        url = f"{self.base_url}/v1/user/subscription"
+        with httpx.Client(timeout=15.0) as client:
+            try:
+                resp = client.get(url, headers=headers)
+            except Exception as exc:
+                return {
+                    "provider": self.provider_name,
+                    "authenticated": False,
+                    "error": f"Failed to connect to ElevenLabs: {exc}",
+                }
+            if resp.status_code == 401:
+                return {
+                    "provider": self.provider_name,
+                    "authenticated": False,
+                    "error": "Invalid ElevenLabs API key (401 Unauthorized)",
+                }
+            if resp.status_code != 200:
+                return {
+                    "provider": self.provider_name,
+                    "authenticated": False,
+                    "error": f"ElevenLabs subscription check failed with HTTP {resp.status_code}",
+                }
+            data = resp.json()
+            return {
+                "provider": self.provider_name,
+                "authenticated": True,
+                "tier": data.get("tier", "unknown"),
+                "character_count": data.get("character_count", 0),
+                "character_limit": data.get("character_limit", 0),
+                "notice": "ElevenLabs Music API requires a paid subscription tier; no free API tier is provided for music synthesis.",
+            }
+

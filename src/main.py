@@ -16,6 +16,8 @@ from src.database.session import init_db
 from src.api.routes_jobs import router as jobs_router
 from src.api.routes_health import router as health_router
 from src.api.routes_video import router as video_router
+from src.api.routes_providers import router as providers_router
+
 
 logger = logging.getLogger("incubrix.api")
 
@@ -220,7 +222,9 @@ def create_app() -> FastAPI:
                 "get_job": "GET /api/v1/jobs/{job_id}",
                 "list_jobs": "GET /api/v1/jobs",
                 "video_analyze": "POST /api/v1/video/analyze",
-                "video_jobs": "POST /api/v1/video/jobs"
+                "video_jobs": "POST /api/v1/video/jobs",
+                "provider_test": "POST /api/v1/providers/test-connection",
+                "provider_comparison": "GET /api/v1/providers/comparison"
             }
         }
 
@@ -228,8 +232,10 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(jobs_router)
     app.include_router(video_router)
+    app.include_router(providers_router)
 
     return app
+
 
 
 app = create_app()

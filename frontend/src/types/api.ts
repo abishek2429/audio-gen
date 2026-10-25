@@ -138,3 +138,51 @@ export interface VideoJobAcceptedResponse extends JobAcceptedResponse {
   video_metadata?: VideoMetadata;
 }
 
+export interface ProviderTestSampleResult {
+  duration_s: number;
+  format: string;
+  sample_rate: number;
+  cost_usd: number;
+  credits_consumed?: number;
+  latency_s: number;
+  sample_audio_size_bytes: number;
+  provider_raw_metadata?: Record<string, any>;
+}
+
+export interface ProviderTestResponse {
+  provider: string;
+  authenticated: boolean;
+  status: string;
+  credits_balance?: number;
+  cost_per_run_usd?: number;
+  free_trial_available: boolean;
+  free_trial_details: string;
+  commercial_use_allowed: boolean;
+  license_type: string;
+  max_duration_s: number;
+  output_formats: string[];
+  sample_generation?: ProviderTestSampleResult;
+  limitations: string[];
+  message: string;
+}
+
+export interface ProviderComparisonResponse {
+  recommended_provider: string;
+  zero_cost_offline_provider: string;
+  providers: Record<string, {
+    provider_display_name: string;
+    official_docs_url: string;
+    pricing_model: string;
+    cost_per_run_usd: number;
+    free_trial_available: boolean;
+    free_trial_details: string;
+    commercial_use_allowed: boolean;
+    license_type: string;
+    max_duration_s: number;
+    output_formats: string[];
+    rate_limits: string;
+    limitations: string[];
+  }>;
+}
+
+

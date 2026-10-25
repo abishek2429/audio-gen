@@ -6,7 +6,38 @@ This document provides full disclosure of every external API service, software l
 
 ## 1. External AI Music & Audio Separation Providers
 
-### 1.1 Soundverse Enterprise API (Primary Hosted Provider)
+### 1.1 Stability AI — Stable Audio (Recommended Commercial Provider)
+* **Provider:** Stability AI Ltd.
+* **Service:** Stable Audio REST API (`api.stability.ai`)
+* **Model:** `stable-audio-3` (via `/v2beta/audio/stable-audio/text-to-audio`)
+* **Official Documentation:** [https://platform.stability.ai/docs/api-reference#tag/Audio](https://platform.stability.ai/docs/api-reference#tag/Audio)
+* **Published Pricing:**
+  * Developer credits cost $0.01/credit ($10 minimum top-up = 1,000 credits).
+  * Audio generation costs 20 credits per generation ($0.20 flat cost).
+* **Free Tier Reality:**
+  * Stability AI developer platform grants 25 free credits upon initial developer signup ($0.25 value).
+  * Because generation costs 20 credits, this provides **exactly 1 free generation** for testing.
+  * *Important distinction:* The consumer web application at `stableaudio.com` offers 50 free credits per month, but those consumer credits **cannot** be used on the developer REST API (`api.stability.ai`).
+* **Commercial License:** Generation using developer API credits grants commercial rights for client deliverables, monetization, and synchronization.
+* **Max Output Duration:** Up to 190 seconds (3 minutes 10 seconds).
+* **Output Format:** MP3 or WAV directly streamed.
+* **Integration Adapter:** `src/providers/stable_audio.py` (`StableAudioAdapter`)
+
+### 1.2 Meta MusicGen via Replicate (Research & Non-Commercial Provider)
+* **Provider:** Replicate Inc. hosting Meta AI's MusicGen model
+* **Service:** Replicate API (`api.replicate.com/v1`)
+* **Official Documentation:** [https://replicate.com/meta/musicgen](https://replicate.com/meta/musicgen)
+* **Published Pricing:**
+  * Hardware compute billing: ~$0.0014 per second on Nvidia A100 GPU (~$0.045 for a 30s audio cue).
+* **Free Tier Reality:**
+  * Replicate has no sustained free API tier. A valid credit card is required to create API tokens.
+* **Licensing Restriction:**
+  * **CRITICAL:** Official Meta MusicGen model weights are released under `CC-BY-NC 4.0` (Creative Commons Attribution-NonCommercial 4.0).
+  * It is strictly legally prohibited to use Meta MusicGen for commercial client projects or monetized background music without a custom commercial agreement from Meta.
+* **Max Output Duration:** 30 seconds default.
+* **Integration Adapter:** `src/providers/replicate.py` (`ReplicateMusicGenAdapter`)
+
+### 1.3 Soundverse Enterprise API
 * **Provider:** Soundverse AI Inc.
 * **Service:** Soundverse Enterprise API Gateway (`apiv2.soundverse.ai`)
 * **Endpoints Used:**
@@ -17,10 +48,11 @@ This document provides full disclosure of every external API service, software l
 * **Published Pricing:**
   * Music Generation: $0.07/track (Royalty-Free), $0.11/track (Standard Commercial).
   * 6-Stem Separation: $0.10 flat per separation.
-* **Commercial License:** Standard commercial tier explicitly grants video synchronization, client deliverables, and commercial monetization rights.
+* **Free Tier Reality:** 10 initial trial credits granted upon developer registration.
+* **Commercial License:** Standard commercial tier explicitly grants video synchronization and commercial monetization rights.
 * **Integration Adapter:** `src/providers/soundverse.py` (`SoundverseAdapter`)
 
-### 1.2 ElevenLabs Music API (Fallback Hosted Provider)
+### 1.4 ElevenLabs Music API
 * **Provider:** ElevenLabs Inc.
 * **Service:** Eleven Music API (`api.elevenlabs.io`)
 * **Endpoints Used:**
@@ -28,16 +60,19 @@ This document provides full disclosure of every external API service, software l
   * Stem Separation: `POST /v1/music/stem-separation` (`six_stems_v1`)
 * **Documentation:** [https://elevenlabs.io/docs/api-reference/music/compose](https://elevenlabs.io/docs/api-reference/music/compose)
 * **Published Pricing:**
-  * ~900 credits/min for generation + ~900 credits/min for stem separation (~$0.30 - $0.60/min based on subscription tier).
-* **Commercial License:** Commercial monetization rights granted on all paid tiers (Starter, Creator, Pro, Scale). Free tier is strictly non-commercial.
+  * Consumes character/audio quota from paid subscription plans (~$0.30 - $0.60/min equivalent).
+* **Free Tier Reality:**
+  * Free tier accounts do not have access to the Music API endpoint. Requires paid Creator or Pro tier.
+* **Commercial License:** Commercial monetization rights granted on all paid tiers.
 * **Integration Adapter:** `src/providers/elevenlabs.py` (`ElevenLabsAdapter`)
 
-### 1.3 Procedural Audio Generator (Default Offline Testing Provider)
+### 1.5 Procedural Audio Generator (Default Offline Testing Provider)
 * **Provider:** Local In-Memory Procedural Synthesis Engine
 * **Algorithm:** Procedural multi-track acoustic synthesis (transient percussion modeling, harmonic overtone bassline, polyphonic triads, bell/melody motifs).
 * **API Cost:** $0.00 (Zero network egress, 100% deterministic, offline).
 * **Commercial Rights:** Fully proprietary internal code, MIT License compatible.
 * **Integration Adapter:** `src/providers/mock_provider.py` (`MockProvider`)
+
 
 ---
 

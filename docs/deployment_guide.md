@@ -90,14 +90,19 @@ cp .env.example .env
 
 | Setting Variable | Default Value | Description |
 | :--- | :--- | :--- |
-| `MUSIC_PROVIDER` | `mock` | Active provider: `mock`, `soundverse`, or `elevenlabs` |
-| `SOUNDVERSE_API_KEY` | *(None)* | API key for primary provider Soundverse Enterprise |
-| `ELEVENLABS_API_KEY` | *(None)* | API key for fallback provider ElevenLabs Music |
-| `DATABASE_URL` | `sqlite:///./incubrix.db` | PostgreSQL in Docker; SQLite for local unit tests |
+| `MUSIC_PROVIDER` | `mock` | Active provider: `mock`, `stable_audio`, `replicate`, `soundverse`, `elevenlabs`, or `auto` |
+| `STABILITY_API_KEY` | *(None)* | API key for primary commercial provider Stability AI (Stable Audio REST API) |
+| `STABILITY_BASE_URL`| `https://api.stability.ai` | Base URL for Stability AI developer REST API |
+| `STABILITY_MODEL`   | `stable-audio-3` | Model identifier for text-to-audio synthesis |
+| `REPLICATE_API_TOKEN` | *(None)* | API token for Meta MusicGen on Replicate (Non-commercial research only) |
+| `SOUNDVERSE_API_KEY` | *(None)* | API key for provider Soundverse Enterprise Gateway |
+| `ELEVENLABS_API_KEY` | *(None)* | API key for provider ElevenLabs Music |
+| `DATABASE_URL` | `sqlite:///./incubrix.db` | PostgreSQL in Docker; SQLite in local / Vercel serverless `/tmp` |
 | `REDIS_URL` | `redis://localhost:6379/0` | Redis task broker and sliding-window rate limit store |
-| `CELERY_ENABLED` | `false` | When `true`, delegates jobs to Celery; when `false`, runs local worker |
+| `CELERY_ENABLED` | `false` | When `true`, delegates jobs to Celery; when `false`, runs in-process worker |
 | `STORAGE_BACKEND` | `local` | `minio` for S3 bucket storage; `local` for filesystem |
 | `DEMO_API_KEY` | *(Empty)* | Optional demo protection key; if set, requires `X-API-Key` on `/api/` |
+
 | `RATE_LIMIT_PER_MINUTE`| `60` | Max requests per minute per IP address (0 disables limit) |
 | `MAX_UPLOAD_SIZE_BYTES`| `52428800` (50MB) | Enforced request body cap; returns HTTP 413 if exceeded |
 | `DEFAULT_SAMPLE_RATE` | `48000` | Mandatory sample rate standard for video production |
@@ -169,4 +174,53 @@ In compliance with the project rule:
    - Vercel automatically detects `vercel.json` and root `package.json`.
    - The React audio workstation builds via `npm run build` into `frontend/dist`.
    - The FastAPI backend runs via `api/index.py` serverless functions with `excludeFiles` to ensure the Lambda bundle remains ~226 MB (well within the 500 MB limit).
-   - Configure environment variables in Vercel Dashboard (e.g. `DATABASE_URL`, `STORAGE_BACKEND`, `SOUNDVERSE_API_KEY`).
+   - Configure server-side environment variables in Vercel Dashboard (Project Settings > Environment Variables):
+     - `MUSIC_PROVIDER` (`stable_audio`, `soundverse`, or `mock`)
+     - `STABILITY_API_KEY` (Keep secret; do NOT prefix with `NEXT_PUBLIC_` or `VITE_`)
+     - `DATABASE_URL` (`sqlite:////tmp/incubrix.db` for ephemeral serverless or remote Postgres)
+     - `STORAGE_BACKEND` (`local` uses ephemeral `/tmp`, or set S3 credentials for persistent audio storage)
+
+---
+
+## 6. Provider Verification & Secret Protection
+
+### API Key Isolation & Protection
+All API credentials (`STABILITY_API_KEY`, `REPLICATE_API_TOKEN`, `SOUNDVERSE_API_KEY`, `ELEVENLABS_API_KEY`) are managed strictly on the backend:
+- Stored exclusively in server environment variables.
+- Never bundled into client-side code, frontend `.env`, or browser bundles.
+- Never echoed in API response payloads, logs, or error responses.
+- If credentials are not configured, the backend returns clear, structured errors or falls back to the deterministic offline `mock` provider.
+
+### Automated Provider Pre-Flight Check & Test Mode
+Before dispatching production generation requests or deploying updates, verify authentication and credits:
+
+1. **Via CLI:**
+   ```bash
+   # Test Stability AI authentication and run a 5-second sample generation
+   python -m src.cli --test-provider --provider stable_audio
+
+   # Test offline mock provider (no keys required)
+   python -m src.cli --test-provider --provider mock
+   ```
+
+2. **Via REST API Endpoint:**
+   ```http
+   POST /api/v1/providers/test-connection
+   Content-Type: application/json
+
+   {
+     "provider": "stable_audio",
+     "perform_sample_generation": true,
+     "prompt": "Warm acoustic guitar and ambient strings background music",
+     "duration_s": 5.0
+   }
+   ```
+   **Response Schema:**
+   - `authenticated`: `true` / `false`
+   - `credits_balance`: Current developer credits on platform
+   - `cost_per_run_usd`: Cost per synthesis ($0.20 for Stable Audio, $0.00 for Mock)
+   - `commercial_use_allowed`: Whether generated output can be commercially monetized
+   - `license_type`: Legal license governing output
+   - `sample_generation`: Duration, latency, cost, and output size of short test run
+   - `limitations`: Explicit list of provider constraints
+
