@@ -23,3 +23,19 @@ htmlcov/
 # Heavy audio binary artifacts (keep metadata/manifests/reports)
 artifacts/**/*.wav
 artifacts/**/*.mp3
+
+# Excel submission and spreadsheet presentations (keep local only)
+*.xlsx
+*.xls
+
+# Confidential assessment brief and documents
+*.pdf
+docs/submission_*
+docs/final_submission_audit.md
+docs/audit_report.md
+
+# Frontend dependencies and production build outputs
+node_modules/
+frontend/node_modules/
+frontend/dist/
+

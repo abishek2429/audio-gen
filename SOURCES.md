@@ -1,6 +1,6 @@
 # SOURCES.md — Models, APIs, Libraries, and Data Sources
 
-This document provides full disclosure of every external API service, software library, dataset, and licensing condition used in the IncuBrix AI Background Music Engine, in strict compliance with the IncuBrix Assessment Integration Standard.
+This document provides full disclosure of every external API service, software library, dataset, and licensing condition used in the IncuBrix AI Background Music Engine, in strict compliance with commercial enterprise integration and licensing standards.
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Document ID:** `ADR-001`  
 **Author:** Senior AI Audio Engineer & Technical Researcher  
-**Project:** IncuBrix Engineering Assessment 1 — AI Background Music Engine for Video  
+**Project:** IncuBrix Studio — AI Background Music Engine for Video Production  
 **Date Created:** October 23, 2026  
 **Status:** Approved for Implementation  
 
@@ -12,7 +12,7 @@
 
 IncuBrix video creators require high-quality, commercially cleared original instrumental music dynamically aligned to their video edit points and scene lengths ($5\text{--}300$ seconds), delivered with genuine multitrack stems (drums, bass, harmony, lead) so video editors can rebalance audio or duck music under voiceover speech.
 
-To satisfy all IncuBrix assessment criteria without architectural bloat or excessive API fees, we must make definitive engineering decisions regarding:
+To satisfy all core production criteria without architectural bloat or excessive API fees, we must make definitive engineering decisions regarding:
 1. **Primary & Fallback AI Music & Stem Providers.**
 2. **Decoupled Provider Architecture (Adapter Pattern with Mock Provider).**
 3. **Core Backend Stack & Background Processing Engine.**
@@ -27,7 +27,7 @@ To satisfy all IncuBrix assessment criteria without architectural bloat or exces
 * **Music Generation Endpoint:** `POST https://apiv2.soundverse.ai/v7/generate/music` (or native `POST /v1/generations` with `generate_music`).
 * **Stem Separation Endpoint:** `POST https://apiv2.soundverse.ai/v1/generate/stem-separation/six-stem` (Demucs 6-way split: drums, bass, vocals, guitar, piano, other).
 * **Rationale for Primary Selection:**
-  1. **Published Flat Pricing:** $\$0.11$ per track (Standard commercial tier) + $\$0.10$ flat per separation = **$\$0.21$ total per track**. This represents less than half the cost of ElevenLabs ($\approx \$0.50$), keeping evaluation costs under $\$15.00$ for the full assessment test pack.
+  1. **Published Flat Pricing:** $\$0.11$ per track (Standard commercial tier) + $\$0.10$ flat per separation = **$\$0.21$ total per track**. This represents less than half the cost of ElevenLabs ($\approx \$0.50$), keeping evaluation costs under $\$15.00$ for comprehensive test runs.
   2. **6 Genuine Instrument Stems:** The 6-stem Demucs split guarantees genuine instrument tracks (drums, bass, guitar, piano, other) rather than frequency-equalized bands.
   3. **Direct Commercial Clearance:** The Standard license tier explicitly covers commercial video synchronization and client deliverables without recurring royalties.
   4. **Native Idempotency:** The gateway natively supports `Idempotency-Key`, aligning directly with Integration Standard Point 4.

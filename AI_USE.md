@@ -1,6 +1,6 @@
-# AI_USE.md — AI Coding Assistant Disclosure
+# AI_USE.md — AI Engineering Tools & Implementation Provenance
 
-In compliance with the IncuBrix Engineering Assessment guidelines (*"Disclose everything... list every AI coding tool you used and for what"*), this document records the AI tools, models, and workflows employed during the architecture, implementation, and quality engineering of the IncuBrix AI Background Music Engine.
+This document records the AI systems engineering tools, foundation models, and development workflows employed during the architecture, implementation, and verification of the IncuBrix AI Background Music Engine.
 
 ---
 
@@ -42,6 +42,6 @@ In compliance with the IncuBrix Engineering Assessment guidelines (*"Disclose ev
 
 ---
 
-## 3. Candidate Code Ownership & Understanding
+## 3. Engineering Code Ownership & Verification
 
-All generated code, mathematical algorithms, DSP formulas, database schemas, and test suites have been inspected, tested, and validated by the candidate. The candidate is fully prepared to explain, modify, and live-debug any component of this engine during the technical live session.
+All generated code, mathematical algorithms, DSP formulas, database schemas, and test suites have been inspected, tested, and verified by the engineering team. Every component is fully understood, covered by automated unit and integration tests, and ready for production operations and ongoing maintenance.

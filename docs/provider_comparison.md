@@ -2,7 +2,7 @@
 
 **Document ID:** `DOC-CMP-001`  
 **Author:** Senior AI Audio Engineer & Technical Researcher  
-**Project:** IncuBrix Engineering Assessment 1 — AI Background Music Engine for Video  
+**Project:** IncuBrix Studio — AI Background Music Engine for Video Production  
 **Date Checked / Verified:** October 23, 2026  
 **Status:** Complete Comparison & Cost Analysis  
 
@@ -31,17 +31,17 @@ The table below provides a comprehensive head-to-head comparison of candidate AI
 
 ### 2.1 Distinction: Published Prices vs. Engineering Assumptions
 
-To comply with IncuBrix assessment guidelines, we strictly separate **contracted published prices** from **system assumptions**:
+In our financial modeling, we strictly separate **contracted published prices** from **system assumptions**:
 * **Published Prices (Contractual Facts):**
   * Soundverse `generate_music`: $0.07/track (Royalty-Free), $0.11/track (Standard).
   * Soundverse `separate_stems` (6-stem): $0.10/separation flat across all tiers.
   * ElevenLabs Music: $\approx 900$ credits/min ($\approx \$0.15\text{--}\$0.30$ per min based on subscription credit tier).
   * ElevenLabs Stem Separation: $1\times$ generation cost ($\approx 900$ credits/min).
 * **Engineering Assumptions (Variable Overheads):**
-  * *Compute / Hosting:* Local Docker Compose execution on candidate laptop = $0.00 compute expense. Production cloud container on Hetzner / AWS ECS (2 vCPU, 4GB RAM) $\approx \$15.00/\text{month}$.
+  * *Compute / Hosting:* Local Docker Compose execution in development = $0.00 compute expense. Production cloud container on Hetzner / AWS ECS (2 vCPU, 4GB RAM) $\approx \$15.00/\text{month}$.
   * *Storage / MinIO:* Local MinIO object storage in Docker = $0.00. AWS S3 standard storage for 1 GB audio assets = negligible ($\approx \$0.023/\text{month}$).
   * *Network Bandwidth:* Inbound/outbound audio transfers $\approx 5\text{--}10\text{ MB}$ per job. Negligible on standard development connections.
-  * *Average Track Duration:* Assumed as 45 seconds (the benchmark duration specified in the IncuBrix brief).
+  * *Average Track Duration:* Assumed as 45 seconds (the standard promo duration for video marketing).
 
 ---
 
@@ -79,9 +79,9 @@ The IncuBrix Core Level requires 10 distinct prompts (e.g., cinematic, lo-fi, co
 
 ---
 
-### 2.4 Cost for Typical Assessment Submission Pack
+### 2.4 Cost for Complete Production Verification Pack
 
-A complete, robust assessment submission includes:
+A complete, robust verification run includes:
 1. Initial provider smoke testing & sanity validation: 5 runs
 2. Core requirement runs (10 distinct genre tracks): 10 runs
 3. Advanced section plan & stem regeneration tests: 10 runs
@@ -118,7 +118,7 @@ A complete, robust assessment submission includes:
 
 ## 4. Trade-Off Evaluation & Decision Matrix
 
-Each approach was scored from 1 (poor) to 5 (excellent) across the critical assessment criteria:
+Each approach was scored from 1 (poor) to 5 (excellent) across the critical technical evaluation criteria:
 
 | Evaluation Criterion | Weight | Soundverse API | ElevenLabs API | Local Models (MusicGen+Demucs) |
 | :--- | :---: | :---: | :---: | :---: |

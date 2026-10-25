@@ -79,7 +79,15 @@ def create_app() -> FastAPI:
                 pass
 
         # 2. Demo access protection (when DEMO_API_KEY is configured)
-        public_paths = {"/health", "/ready", "/docs", "/openapi.json", "/redoc"}
+        public_paths = {
+            "/health",
+            "/ready",
+            "/api/v1/health",
+            "/api/v1/ready",
+            "/docs",
+            "/openapi.json",
+            "/redoc",
+        }
         path = request.url.path
         if settings.demo_api_key and settings.demo_api_key.strip():
             if path not in public_paths and not path.startswith("/docs"):

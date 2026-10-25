@@ -2,18 +2,18 @@
 
 **Document ID:** `DOC-LIC-001`  
 **Author:** Senior AI Audio Engineer & Technical Researcher  
-**Project:** IncuBrix Engineering Assessment 1 — AI Background Music Engine for Video  
+**Project:** IncuBrix Studio — AI Background Music Engine for Video Production  
 **Date Checked / Verified:** October 23, 2026  
 **Status:** Complete Legal & Compliance Audit  
 
 ---
 
-## 1. Executive Summary & Assessment Authority
+## 1. Executive Summary & Commercial Standards
 
-IncuBrix Engineering Assessment 1 enforces strict legal and intellectual property rules for all software, models, and audio outputs:
-* **Must-Have 4:** *"Safe to publish commercially. Every model, service, sample and loop in the default path allows commercial use of its output, with a link to the terms in SOURCES.md. The system never copies an existing song."*
-* **Rule 2 (Tools & Resources):** *"Commercially usable. Everything in your default path, and everything it outputs, must be licensed for commercial use. No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path. Avoid AGPL code in the shipped service."*
-* **Rule 5 (Repository Integrity):** *"No secrets in the code. API keys live in environment variables or a secret store, never in the repository, logs or screenshots."*
+IncuBrix Studio enforces strict commercial legal and intellectual property rules for all software, models, and audio outputs:
+* **Core Requirement 4 (Commercial Rights):** *"Safe to publish commercially. Every model, service, sample and loop in the default path allows commercial use of its output, with a link to the terms in SOURCES.md. The system never copies an existing song."*
+* **Licensing Standard (Tools & Resources):** *"Commercially usable. Everything in your default path, and everything it outputs, must be licensed for commercial use. No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path. Avoid AGPL code in the shipped service."*
+* **Security & Secret Integrity:** *"No secrets in the code. API keys live in environment variables or a secret store, never in the repository, logs or screenshots."*
 
 This review establishes a four-tier intellectual property taxonomy to analyze every component in our dependency chain:
 1. **Tier 1: Source Code Licences** (permissive open-source vs copyleft).
@@ -111,8 +111,8 @@ This review establishes a four-tier intellectual property taxonomy to analyze ev
   * MUSDB-HQ is strictly licensed for **academic non-commercial research purposes only**.
   * Demucs lead author Alexandre Défossez publicly clarified:
     > *"The weights themselves are however just a research artifact and provided only for personal / research usage. The issue is that the licence of MusDB dataset is only for research purpose."*
-* **Impact on IncuBrix Assessment:**
-  * Self-hosting Demucs with official pre-trained weights inside the local Docker container as the **default production path** directly violates IncuBrix Rule 2: *"No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path."*
+* **Commercial Compliance Impact:**
+  * Self-hosting Demucs with official pre-trained weights inside the local Docker container as the **default production path** directly violates commercial licensing standards: *"No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path."*
   * **Compliance Strategy:** Demucs must **NOT** be the default stem-separation engine in self-hosted mode with official weights. Instead, stem separation in the default path must be routed through a commercially cleared hosted API (such as Soundverse's hosted 6-stem endpoint or ElevenLabs' stem separation), or through our procedural Mock Adapter for offline verification.
 
 ---
@@ -122,7 +122,7 @@ This review establishes a four-tier intellectual property taxonomy to analyze ev
 * **Primary Documentation:** [Meta AudioCraft Repository](https://github.com/facebookresearch/audiocraft)
 * **Tier 1 (Code):** MIT License.
 * **Tier 2 (Model Weights):** Meta released the pre-trained weights for MusicGen (`small`, `medium`, `melody`, `large`) under the **CC BY-NC 4.0 (Creative Commons Non-Commercial) License**.
-* **Compliance Verdict:** **STRICT DISQUALIFICATION.** Any default path incorporating Meta's pre-trained MusicGen weights will automatically fail IncuBrix Must-Have 4 and Rule 2.
+* **Compliance Verdict:** **STRICT DISQUALIFICATION.** Any default path incorporating Meta's pre-trained MusicGen weights will automatically fail commercial production compliance.
 
 ---
 
@@ -130,7 +130,7 @@ This review establishes a four-tier intellectual property taxonomy to analyze ev
 
 The core Python backend and container stack rely strictly on enterprise-safe, non-viral open-source licenses:
 
-| Library / Dependency | Primary Function | Published License | Assessment Clearance (Rule 2) |
+| Library / Dependency | Primary Function | Published License | Commercial Clearance |
 | :--- | :--- | :--- | :--- |
 | **Python 3.11** | Runtime Environment | Python Software Foundation (PSF) | **Approved** (Permissive) |
 | **FastAPI** | REST API Framework | MIT License | **Approved** (Permissive) |

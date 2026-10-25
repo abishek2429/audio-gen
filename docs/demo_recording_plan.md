@@ -80,7 +80,7 @@
      python scripts/batch_runner.py --inputs-dir test_inputs --api-url http://localhost:8000 --output-dir artifacts/test_results
      ```
 * **Spoken Narrative:**
-  > "Our automated batch runner submits test vectors covering all 15 assessment hard cases—including ultra-short 5-second cues, 5-minute tracks, contradictory prompts, artist name references, voiceovers with long silences, and simultaneous submissions—validating that all 15 cases pass independent DSP checks."
+  > "Our automated batch runner submits test vectors covering all 15 production edge cases—including ultra-short 5-second cues, 5-minute tracks, contradictory prompts, artist name references, voiceovers with long silences, and simultaneous submissions—validating that all 15 cases pass independent DSP checks."
 
 ---
 

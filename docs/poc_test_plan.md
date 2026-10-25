@@ -2,7 +2,7 @@
 
 **Document ID:** `DOC-TST-001`  
 **Author:** Senior AI Audio Engineer & Technical Researcher  
-**Project:** IncuBrix Engineering Assessment 1 — AI Background Music Engine for Video  
+**Project:** IncuBrix Studio — AI Background Music Engine for Video Production  
 **Date Created:** October 23, 2026  
 **Status:** Approved for Implementation  
 

@@ -2,7 +2,7 @@
 
 **Document ID:** `DOC-RES-001`  
 **Author:** Senior AI Audio Engineer & Technical Researcher  
-**Project:** IncuBrix Engineering Assessment 1 — AI Background Music Engine for Video  
+**Project:** IncuBrix Studio — AI Background Music Engine for Video Production  
 **Date Checked / Verified:** October 23, 2026  
 **Status:** Complete Research & Feasibility Analysis  
 
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary & Purpose
 
-The IncuBrix AI Background Music Engine requires generating original, commercially safe instrumental music that fits video durations exactly (within $\pm 0.05$ seconds) with intentional musical endings, delivered as a finished mix alongside at least three genuine instrument stems. The assessment strictly mandates commercial usability for all components in the default path, 48 kHz WAV audio conforming to $-16 \text{ LUFS} \pm 1 \text{ LU}$ and $\le -1.0 \text{ dBTP}$, and verifiable linear stem reconstructability.
+The IncuBrix AI Background Music Engine requires generating original, commercially safe instrumental music that fits video durations exactly (within $\pm 0.05$ seconds) with intentional musical endings, delivered as a finished mix alongside at least three genuine instrument stems. The production specification strictly mandates commercial usability for all components in the default path, 48 kHz WAV audio conforming to $-16 \text{ LUFS} \pm 1 \text{ LU}$ and $\le -1.0 \text{ dBTP}$, and verifiable linear stem reconstructability.
 
 This report documents exhaustive, evidence-based technical research into the candidate AI music and audio isolation providers:
 1. **ElevenLabs Music API** (`Eleven Music` / `POST /v1/music` & `POST /v1/music/stem-separation`)
@@ -228,12 +228,12 @@ Soundverse publishes transparent, flat-rate pricing per track and per separation
 * **Architecture:** 4-stem (`drums`, `bass`, `vocals`, `other`) or 6-stem (`drums`, `bass`, `vocals`, `guitar`, `piano`, `other`).
 * **Source Code License:** **MIT License** (fully commercial-friendly for software integration).
 * **Model Weights License & Data Risk:** The official pre-trained weights (`htdemucs`, `htdemucs_6s`, `htdemucs_ft`) were trained on the **MUSDB-HQ / MUSDB18** dataset, which is restricted strictly to non-commercial academic research. Demucs primary author Alexandre Défossez has explicitly noted that Meta's pre-trained weights are a research artifact for personal/research use.
-* **Assessment Impact:** Using local Demucs with standard pre-trained weights in the default production path violates IncuBrix Rule 2 ("*No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path*"). However, hosted commercial APIs (like Soundverse) assume the commercial indemnification and platform licensing on their end.
+* **Commercial Compliance Impact:** Using local Demucs with standard pre-trained weights in the default production path violates our commercial license standard ("*No research-only or non-commercial models, data or media (for example CC BY-NC) in the default path*"). However, hosted commercial APIs (like Soundverse) assume the commercial indemnification and platform licensing on their end.
 
 ### 4.3 Meta AudioCraft / MusicGen
 * **Repository:** `facebookresearch/audiocraft`
 * **Weights License:** **CC BY-NC 4.0 (Non-Commercial)**.
-* **Assessment Impact:** **Disqualified** from the default path. Cannot be used commercially without training custom weights from scratch on fully licensed audio datasets.
+* **Commercial Compliance Impact:** **Disqualified** from the default path. Cannot be used commercially without training custom weights from scratch on fully licensed audio datasets.
 
 ---
 

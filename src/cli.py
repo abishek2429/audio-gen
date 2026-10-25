@@ -15,6 +15,10 @@ import argparse
 from typing import Optional, Dict
 import numpy as np
 import soundfile as sf
+# Ensure project root is on sys.path for direct CLI execution
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 
 from src.config import settings
 from src.models import MusicJobRequest, MusicManifest
@@ -289,7 +293,7 @@ def run_pipeline(
 def main():
     """CLI Entry point."""
     parser = argparse.ArgumentParser(
-        description="IncuBrix AI Background Music Engine — Day 1 Audio PoC"
+        description="IncuBrix AI Background Music Engine — Audio Generation & DSP Pipeline"
     )
     parser.add_argument("--prompt", type=str, required=True, help="Music description prompt")
     parser.add_argument("--duration", type=float, required=True, help="Target duration in seconds (5-300)")

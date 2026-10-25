@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-In adherence to IncuBrix Rule 9 ("Keep failed experiments and meaningful errors as evidence") and Assessment Rule 5 ("An honest report of what does not work scores better than a polished demo that hides problems"), this document records the known physical, algorithmic, and operational limitations of the Day 1 Proof-of-Concept.
+In adherence to IncuBrix engineering principles ("Keep failed experiments and meaningful errors as evidence" and "An honest report of technical trade-offs provides better reliability than a polished demo that conceals edge cases"), this document records the known physical, algorithmic, and operational limitations of the audio engine.
 
 ---
 
@@ -21,8 +21,8 @@ In adherence to IncuBrix Rule 9 ("Keep failed experiments and meaningful errors 
   * In deep neural source separation of real recorded or generated mixes (such as Meta Demucs `htdemucs_6s` running on Soundverse or ElevenLabs), reconstruction SDR typically ranges between **$20.0\text{ dB}$ and $32.0\text{ dB}$**.
 * **Underlying Cause:**
   * Neural source separation models operate via time-frequency masking or complex Spectrogram U-Nets. They inherently produce non-linear phase smearing, slight spectral bleed between harmonically coincident instruments (e.g., bass fundamental and kick thump, or piano chords and guitar harmonics), and psychoacoustic residual artifacts.
-* **Assessment Impact:**
-  * The IncuBrix brief requires $\text{SDR} \ge 20.0\text{ dB}$ for neural source separation. Both Soundverse and ElevenLabs meet this threshold, but editors re-summing neural stems will observe a subtle perceptual difference compared to the original master mix if individual stem levels are drastically modified.
+* **Production Impact:**
+  * The system requires $\text{SDR} \ge 20.0\text{ dB}$ for neural source separation. Both Soundverse and ElevenLabs meet this threshold, but editors re-summing neural stems will observe a subtle perceptual difference compared to the original master mix if individual stem levels are drastically modified.
 
 ### 2.2 Duration Parameterization & Tail Trimming Across Providers
 * **Observed Phenomenon:**

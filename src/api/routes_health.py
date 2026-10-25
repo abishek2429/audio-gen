@@ -17,6 +17,13 @@ router = APIRouter(tags=["Health"])
     description="Returns HTTP 200 if the FastAPI application process is alive and responsive.",
     status_code=status.HTTP_200_OK,
 )
+@router.get(
+    "/api/v1/health",
+    summary="Service Liveness Check (API v1 Alias)",
+    description="Returns HTTP 200 if the FastAPI application process is alive and responsive.",
+    status_code=status.HTTP_200_OK,
+    include_in_schema=False,
+)
 def get_health() -> Dict[str, Any]:
     """Liveness probe."""
     return {
@@ -30,6 +37,12 @@ def get_health() -> Dict[str, Any]:
     "/ready",
     summary="Service Readiness Check",
     description="Verifies operational connectivity to PostgreSQL/SQLite and MinIO storage.",
+)
+@router.get(
+    "/api/v1/ready",
+    summary="Service Readiness Check (API v1 Alias)",
+    description="Verifies operational connectivity to PostgreSQL/SQLite and MinIO storage.",
+    include_in_schema=False,
 )
 def get_ready(response: Response, db: Session = Depends(get_db)) -> Dict[str, Any]:
     """Readiness probe checking database, storage, and optional Redis broker."""

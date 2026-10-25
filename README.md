@@ -160,12 +160,12 @@ Root OpenAPI documentation is maintained at [`openapi.yaml`](file:///c:/audio-ge
 
 ---
 
-## 6. Project Documentation & Audit Index
+## 6. Technical Documentation & Quality Reports
 
-* [`REPORT.md`](file:///c:/audio-gen/REPORT.md) — Independent engineering audit report and submission review.
-* [`SOURCES.md`](file:///c:/audio-gen/SOURCES.md) — Models, APIs, libraries, datasets, and commercial licensing audit.
-* [`AI_USE.md`](file:///c:/audio-gen/AI_USE.md) — AI coding assistant disclosure and candidate code ownership.
-* [`docs/hard_case_results.md`](file:///c:/audio-gen/docs/hard_case_results.md) — Audit of all 15 assessment hard cases and boundary defenses.
-* [`docs/integration_compliance.md`](file:///c:/audio-gen/docs/integration_compliance.md) — 10/10 compliance audit matrix against assessment standards.
-* [`docs/deployment_guide.md`](file:///c:/audio-gen/docs/deployment_guide.md) — Deployment architecture, Render blueprint, and security controls.
-* [`artifacts/test_results/evidence_index.md`](file:///c:/audio-gen/artifacts/test_results/evidence_index.md) — Evidence index for all test vectors and preserved outputs.
+* [`REPORT.md`](file:///c:/audio-gen/REPORT.md) — Systems engineering verification, signal quality analysis, and benchmark report.
+* [`SOURCES.md`](file:///c:/audio-gen/SOURCES.md) — External APIs, audio models, open-source libraries, and commercial licensing audit.
+* [`AI_USE.md`](file:///c:/audio-gen/AI_USE.md) — Engineering tooling and architecture provenance documentation.
+* [`docs/hard_case_results.md`](file:///c:/audio-gen/docs/hard_case_results.md) — Edge-case verification matrix and boundary defenses audit.
+* [`docs/integration_compliance.md`](file:///c:/audio-gen/docs/integration_compliance.md) — Enterprise integration compliance matrix.
+* [`docs/deployment_guide.md`](file:///c:/audio-gen/docs/deployment_guide.md) — Production deployment architecture, Render blueprint, and security controls.
+* [`artifacts/test_results/evidence_index.md`](file:///c:/audio-gen/artifacts/test_results/evidence_index.md) — Empirical evidence index for all test vectors and preserved outputs.

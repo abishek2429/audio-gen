@@ -4,7 +4,7 @@
 
 Build a Python-based, containerized API service with a React web dashboard that generates original instrumental background music for videos. The system must deliver an exactly timed final mix and at least three genuine, separate instrument stems.
 
-The uploaded assessment brief is the source of truth for all requirements.
+The IncuBrix AI Audio Engine engineering specification is the source of truth for all requirements.
 
 ## Preferred technology stack
 
@@ -98,6 +98,6 @@ Support prompt, duration_s, sections, tempo_bpm, key, loopable, narration_url, s
 3. Measure reconstruction, duration, sample rate, loudness, and true peak.
 4. Implement the backend and automated tests.
 5. Build the dashboard.
-6. Deploy, test hard cases, and prepare the complete submission.
+6. Deploy, test hard cases, and finalize production verification.
 
-The assessment brief takes precedence over these notes if any conflict exists.
+The engineering specification takes precedence over these notes if any conflict exists.

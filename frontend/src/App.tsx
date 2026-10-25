@@ -114,7 +114,7 @@ export function App() {
           }}
         >
           <div>
-            IncuBrix AI Background Music Engine · Engineering Assessment 1
+            IncuBrix Studio · Professional AI Background Music Engine for Video Production
           </div>
           <div style={{ display: "flex", gap: "16px" }}>
             <span>48 kHz 24-bit PCM WAV</span>

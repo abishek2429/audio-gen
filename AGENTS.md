@@ -1,7 +1,7 @@
 # Agent Instructions — IncuBrix AI Music Engine
 
 ## Authority
-The uploaded IncuBrix assessment brief is the primary requirements document. RESEARCH_NOTES.md is supporting research, not proof of provider capabilities.
+The IncuBrix AI Audio Engine engineering specification is the primary requirements document. RESEARCH_NOTES.md is supporting research, not proof of provider capabilities.
 
 ## Working rules
 1. Inspect the existing code before making changes.
@@ -15,7 +15,7 @@ The uploaded IncuBrix assessment brief is the primary requirements document. RES
 9. Keep failed experiments and meaningful errors as evidence.
 10. Keep provider integrations behind interfaces and support a mock implementation.
 11. Use clear, typed, maintainable Python and TypeScript.
-12. Prefer the simplest architecture that satisfies the assessment.
+12. Prefer the simplest architecture that satisfies the engineering requirements.
 
 ## Before each task
 - Inspect relevant files.
@@ -33,4 +33,4 @@ The uploaded IncuBrix assessment brief is the primary requirements document. RES
 ## Quality gate
 Do not move past the provider proof of concept until there is evidence that a viable workflow can generate instrumental music and produce acceptable, genuine instrument stems with commercially suitable rights.
 
-Do not claim the project is complete until the mandatory requirements have been tested and the evidence has been assembled.
+Do not claim the project is complete until the mandatory production requirements have been tested and the evidence has been assembled.

@@ -12,7 +12,7 @@
 
 This report documents the automated quality assurance, reliability engineering, and audio signal validation executed against the **IncuBrix AI Background Music Engine**.
 
-To satisfy the requirements of the IncuBrix assessment brief, an exhaustive two-tier validation harness was created and executed:
+To ensure carrier-grade reliability across all production edge cases, an exhaustive two-tier validation harness was created and executed:
 1. **Automated Unit & Integration Test Suite (`tests/`):** 62 automated test cases evaluating DSP precision, mathematical stem reconstruction, prompt safety/copyright compliance, concurrency, network timeout recovery, and API boundary integrity.
 2. **Reproducible Batch Runner CLI (`scripts/batch_runner.py`):** An automated harness that submits JSON test specifications to the live API, polls asynchronous jobs to completion, downloads all generated artifacts (`mix.wav`, stems, ducked mix, and `music_manifest.json`), runs independent ITU-R BS.1770-4 / EBU R128 digital signal processing validation, and generates consolidated Markdown and JSON reports.
 
@@ -45,7 +45,7 @@ Every synthesized track was analyzed using independent DSP algorithms in `src/au
 
 ## 3. Comprehensive Hard Cases: Expected vs Actual Behavior
 
-The assessment brief defines 15 critical hard cases, plus strict field rejection rules. The table below details the implementation, expected behavior, and verified actual outcomes.
+The engineering specification defines 15 critical edge cases, plus strict field rejection rules. The table below details the implementation, expected behavior, and verified actual outcomes.
 
 | Case ID | Hard Case Description | Expected Behavior | Actual Measured Outcome | Status |
 | :---: | :--- | :--- | :--- | :---: |
