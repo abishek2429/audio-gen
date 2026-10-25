@@ -169,6 +169,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/video/analyze:
+    post:
+      tags:
+      - Video-to-Beat
+      summary: Analyze video visual dynamics and generate musical arrangement plan
+      description: Upload a video file to extract duration, scene cuts, pacing, mood, and a synchronized music plan.
+      operationId: analyze_video_api_v1_video_analyze_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Supported video file (.mp4, .mov, .avi, .webm)
+                style:
+                  type: string
+                  description: Optional style preference
+                prompt_override:
+                  type: string
+                  description: Optional custom prompt instructions
+      responses:
+        '200':
+          description: Video analyzed successfully
+        '400':
+          description: Invalid video file or unsupported format
+        '413':
+          description: Video file exceeds upload size limit
+  /api/v1/video/jobs:
+    post:
+      tags:
+      - Video-to-Beat
+      summary: Submit Video-to-Beat background music generation job
+      description: Upload video, extract timing and mood, and enqueue background soundtrack generation.
+      operationId: create_video_job_api_v1_video_jobs_post
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          title: Idempotency-Key
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Video file to soundtrack
+                style:
+                  type: string
+                  description: Optional style preference
+                prompt_override:
+                  type: string
+                  description: Optional custom prompt instructions
+      responses:
+        '202':
+          description: Video-to-beat job accepted and queued
+        '400':
+          description: Invalid video or request parameters
+        '409':
+          description: Idempotency key reuse conflict
+        '413':
+          description: Video file exceeds upload limit
 components:
   schemas:
     ErrorDetail:

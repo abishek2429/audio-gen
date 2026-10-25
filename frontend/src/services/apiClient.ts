@@ -8,6 +8,8 @@ import type {
   HealthCheckResponse,
   ReadyCheckResponse,
   ErrorDetail,
+  VideoAnalysisResponse,
+  VideoJobAcceptedResponse,
 } from "../types/api";
 
 const DEFAULT_API_URL = import.meta.env.DEV
@@ -102,6 +104,47 @@ export const apiClient = {
   async listJobs(limit = 50, offset = 0): Promise<JobStatusResponse[]> {
     const res = await fetch(`${API_BASE_URL}/api/v1/jobs?limit=${limit}&offset=${offset}`);
     return handleResponse<JobStatusResponse[]>(res);
+  },
+
+  async analyzeVideo(
+    file: File,
+    style?: string,
+    promptOverride?: string
+  ): Promise<VideoAnalysisResponse> {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (style) formData.append("style", style);
+    if (promptOverride) formData.append("prompt_override", promptOverride);
+
+    const res = await fetch(`${API_BASE_URL}/api/v1/video/analyze`, {
+      method: "POST",
+      body: formData,
+    });
+    return handleResponse<VideoAnalysisResponse>(res);
+  },
+
+  async createVideoJob(
+    file: File,
+    style?: string,
+    promptOverride?: string,
+    idempotencyKey?: string
+  ): Promise<VideoJobAcceptedResponse> {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (style) formData.append("style", style);
+    if (promptOverride) formData.append("prompt_override", promptOverride);
+
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) {
+      headers["Idempotency-Key"] = idempotencyKey;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/v1/video/jobs`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+    return handleResponse<VideoJobAcceptedResponse>(res);
   },
 };
 

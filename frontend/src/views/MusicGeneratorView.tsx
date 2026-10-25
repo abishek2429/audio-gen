@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Sparkles, ChevronDown, ChevronUp, Plus, Trash2, AlertCircle } from "lucide-react";
+import { Sparkles, ChevronDown, ChevronUp, Plus, Trash2, AlertCircle, Film } from "lucide-react";
 import { apiClient, ApiError } from "../services/apiClient";
 import type { MusicJobRequest, SectionPlan } from "../types/api";
+import { VideoToBeatView } from "./VideoToBeatView";
 
 interface MusicGeneratorViewProps {
   initialValues?: {
@@ -10,7 +11,7 @@ interface MusicGeneratorViewProps {
     tempo?: number;
     key?: string;
   };
-  onJobCreated: (jobId: string) => void;
+  onJobCreated: (jobId: string, videoFile?: File) => void;
   isGenerating?: boolean;
 }
 
@@ -30,6 +31,7 @@ export const MusicGeneratorView: React.FC<MusicGeneratorViewProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"prompt" | "video">("prompt");
 
   const examplePrompts = [
     { label: "Cinematic", text: "dramatic cinematic orchestral, soaring strings, epic drums, builds to climax" },
@@ -116,7 +118,65 @@ export const MusicGeneratorView: React.FC<MusicGeneratorViewProps> = ({
 
   return (
     <div className="panel" style={{ padding: "24px 28px" }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {/* Creation Mode Switcher: Prompt vs Video-to-Beat */}
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          borderBottom: "1px solid var(--border-subtle)",
+          paddingBottom: "16px",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setMode("prompt")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 16px",
+            borderRadius: "var(--radius-md)",
+            border: `1px solid ${mode === "prompt" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+            background: mode === "prompt" ? "var(--accent-subtle)" : "transparent",
+            color: mode === "prompt" ? "var(--accent-text)" : "var(--text-secondary)",
+            fontWeight: 600,
+            fontSize: "0.85rem",
+            cursor: "pointer",
+            transition: "all var(--transition-fast)",
+          }}
+        >
+          <Sparkles size={15} />
+          <span>Prompt to Music</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMode("video")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 16px",
+            borderRadius: "var(--radius-md)",
+            border: `1px solid ${mode === "video" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+            background: mode === "video" ? "var(--accent-subtle)" : "transparent",
+            color: mode === "video" ? "var(--accent-text)" : "var(--text-secondary)",
+            fontWeight: 600,
+            fontSize: "0.85rem",
+            cursor: "pointer",
+            transition: "all var(--transition-fast)",
+          }}
+        >
+          <Film size={15} />
+          <span>Video-to-Beat</span>
+        </button>
+      </div>
+
+      {mode === "video" ? (
+        <VideoToBeatView onJobCreated={onJobCreated} isGenerating={isGenerating} />
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {/* Prompt Input Area */}
         <div className="form-group">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "6px" }}>
@@ -421,6 +481,7 @@ export const MusicGeneratorView: React.FC<MusicGeneratorViewProps> = ({
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 };

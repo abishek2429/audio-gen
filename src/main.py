@@ -15,6 +15,7 @@ from src.logging_config import setup_structured_logging, correlation_id_ctx
 from src.database.session import init_db
 from src.api.routes_jobs import router as jobs_router
 from src.api.routes_health import router as health_router
+from src.api.routes_video import router as video_router
 
 logger = logging.getLogger("incubrix.api")
 
@@ -217,13 +218,16 @@ def create_app() -> FastAPI:
             "endpoints": {
                 "create_job": "POST /api/v1/music/jobs",
                 "get_job": "GET /api/v1/jobs/{job_id}",
-                "list_jobs": "GET /api/v1/jobs"
+                "list_jobs": "GET /api/v1/jobs",
+                "video_analyze": "POST /api/v1/video/analyze",
+                "video_jobs": "POST /api/v1/video/jobs"
             }
         }
 
     # Register Routers
     app.include_router(health_router)
     app.include_router(jobs_router)
+    app.include_router(video_router)
 
     return app
 

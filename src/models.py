@@ -154,3 +154,73 @@ class ValidationReport(BaseModel):
     evaluated_at: str
     gates: Dict[str, GateResult]
     summary: str
+
+
+class VideoMetadataResponse(BaseModel):
+    """Video file metadata returned by video analysis."""
+    filename: str
+    duration_s: float
+    fps: float
+    width: int
+    height: int
+    frame_count: int
+    aspect_ratio: str
+    file_size_bytes: int
+
+
+class VideoActivityResponse(BaseModel):
+    """Motion, visual pacing, and mood metrics."""
+    avg_motion: float
+    max_motion: float
+    motion_variance: float
+    avg_brightness: float
+    avg_saturation: float
+    warm_color_ratio: float
+    pacing: str
+    detected_mood: str
+
+
+class KeyframeThumbnailResponse(BaseModel):
+    """Timestamped keyframe thumbnail encoded as a base64 JPEG data URI."""
+    timestamp_s: float
+    data_uri: str
+
+
+class MusicalAccentResponse(BaseModel):
+    """Timestamped musical accent cue aligned with a visual cut or motion event."""
+    timestamp_s: float
+    event_description: str
+    musical_action: str
+
+
+class MusicPlanResponse(BaseModel):
+    """Recommended musical arrangement plan generated from video analysis."""
+    genre: str
+    mood: str
+    tempo_bpm: int
+    key: str
+    rhythmic_style: str
+    intensity: str
+    instrumentation: List[str]
+    target_duration_s: float
+    sections: List[SectionPlan]
+    accents: List[MusicalAccentResponse]
+    prompt: str
+
+
+class VideoAnalysisResponse(BaseModel):
+    """Complete video analysis and recommended musical arrangement plan."""
+    metadata: VideoMetadataResponse
+    scene_cuts: List[float]
+    activity: VideoActivityResponse
+    keyframes: List[KeyframeThumbnailResponse]
+    accent_timestamps: List[float]
+    audio_present: bool = False
+    recommended_plan: MusicPlanResponse
+
+
+class VideoJobAcceptedResponse(JobAcceptedResponse):
+    """Response returned upon submitting a Video-to-Beat generation job."""
+    plan: Optional[MusicPlanResponse] = None
+    video_metadata: Optional[VideoMetadataResponse] = None
+

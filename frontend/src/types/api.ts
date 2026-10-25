@@ -75,3 +75,66 @@ export interface ReadyCheckResponse {
   status: string;
   checks: Record<string, string>;
 }
+
+export interface VideoMetadata {
+  filename: string;
+  duration_s: number;
+  fps: number;
+  width: number;
+  height: number;
+  frame_count: number;
+  aspect_ratio: string;
+  file_size_bytes: number;
+}
+
+export interface VideoActivityMetrics {
+  avg_motion: number;
+  max_motion: number;
+  motion_variance: number;
+  avg_brightness: number;
+  avg_saturation: number;
+  warm_color_ratio: number;
+  pacing: string;
+  detected_mood: string;
+}
+
+export interface KeyframeThumbnail {
+  timestamp_s: number;
+  data_uri: string;
+}
+
+export interface MusicalAccent {
+  timestamp_s: number;
+  event_description: string;
+  musical_action: string;
+}
+
+export interface MusicPlan {
+  genre: string;
+  mood: string;
+  tempo_bpm: number;
+  key: string;
+  rhythmic_style: string;
+  intensity: string;
+  instrumentation: string[];
+  target_duration_s: number;
+  sections: SectionPlan[];
+  accents: MusicalAccent[];
+  prompt: string;
+}
+
+export interface VideoAnalysisResponse {
+  metadata: VideoMetadata;
+  scene_cuts: number[];
+  activity: VideoActivityMetrics;
+  keyframes: KeyframeThumbnail[];
+  accent_timestamps: number[];
+  audio_present: boolean;
+  recommended_plan: MusicPlan;
+}
+
+export interface VideoJobAcceptedResponse extends JobAcceptedResponse {
+  plan?: MusicPlan;
+  video_metadata?: VideoMetadata;
+}
+

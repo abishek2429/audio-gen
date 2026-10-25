@@ -12,6 +12,8 @@ export function App() {
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [currentJob, setCurrentJob] = useState<JobStatusResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [generatorPresets, setGeneratorPresets] = useState<{
     prompt?: string;
     duration_s?: number;
@@ -42,9 +44,14 @@ export function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleJobCreated = (jobId: string) => {
+  const handleJobCreated = (jobId: string, uploadedVideo?: File) => {
     setCurrentJobId(jobId);
     setIsGenerating(true);
+    if (uploadedVideo) {
+      setVideoFile(uploadedVideo);
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+      setVideoUrl(URL.createObjectURL(uploadedVideo));
+    }
     setActiveTab("studio");
   };
 
@@ -82,6 +89,8 @@ export function App() {
               /* If job succeeded, display clean audio studio results */
               <AudioStudioView
                 job={currentJob}
+                videoUrl={videoUrl}
+                videoFile={videoFile}
                 onNavigate={handleNavigate}
                 onNewGeneration={handleNewGeneration}
               />
