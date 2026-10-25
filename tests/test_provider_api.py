@@ -80,3 +80,73 @@ def test_provider_test_connection_unconfigured_external_key():
     assert "STABILITY_API_KEY" in data["message"]
     assert data["cost_per_run_usd"] == 0.20
     assert data["free_trial_available"] is True
+
+
+def test_provider_test_connection_unsupported_provider():
+    """Verify testing an invalid/unsupported provider returns configuration_error."""
+    resp = client.post(
+        "/api/v1/providers/test-connection",
+        json={"provider": "nonexistent_synth_999"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "configuration_error"
+    assert data["authenticated"] is False
+    assert "Unsupported provider" in data["message"]
+
+
+def test_provider_test_connection_scrubs_secrets(monkeypatch):
+    """Verify that credentials or tokens are never leaked in diagnostic messages."""
+    from src.providers.stable_audio import StableAudioAdapter
+    from src.providers.base import ProviderException
+
+    def mock_check(self):
+        raise ProviderException("Failed with sk-1234567890abcdef and Bearer secret_tok_xyz")
+
+    monkeypatch.setattr(StableAudioAdapter, "check_connection_and_balance", mock_check)
+    monkeypatch.setattr("src.config.settings.stability_api_key", "sk-1234567890abcdef")
+
+    resp = client.post(
+        "/api/v1/providers/test-connection",
+        json={"provider": "stable_audio"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "sk-1234567890abcdef" not in data["message"]
+    assert "secret_tok_xyz" not in data["message"]
+    assert "sk-1234..." in data["message"] or "[REDACTED]" in data["message"]
+
+
+def test_provider_test_connection_error_status_mapping(monkeypatch):
+    """Verify specific ProviderException codes map to precise status strings."""
+    from src.providers.stable_audio import StableAudioAdapter
+    from src.providers.base import ProviderException, ProviderTimeoutException
+
+    # 1. Quota Exhausted
+    monkeypatch.setattr("src.config.settings.stability_api_key", "sk-valid-key")
+    monkeypatch.setattr(
+        StableAudioAdapter,
+        "check_connection_and_balance",
+        lambda self: (_ for _ in ()).throw(ProviderException("Credits empty", code="QUOTA_EXHAUSTED")),
+    )
+    r_quota = client.post("/api/v1/providers/test-connection", json={"provider": "stable_audio"})
+    assert r_quota.json()["status"] == "quota_exhausted"
+
+    # 2. Rate Limited
+    monkeypatch.setattr(
+        StableAudioAdapter,
+        "check_connection_and_balance",
+        lambda self: (_ for _ in ()).throw(ProviderException("Too many calls", code="RATE_LIMIT_EXCEEDED")),
+    )
+    r_rate = client.post("/api/v1/providers/test-connection", json={"provider": "stable_audio"})
+    assert r_rate.json()["status"] == "rate_limited"
+
+    # 3. Provider Outage / Timeout
+    monkeypatch.setattr(
+        StableAudioAdapter,
+        "check_connection_and_balance",
+        lambda self: (_ for _ in ()).throw(ProviderTimeoutException("Gateway timed out")),
+    )
+    r_outage = client.post("/api/v1/providers/test-connection", json={"provider": "stable_audio"})
+    assert r_outage.json()["status"] == "provider_outage"
+

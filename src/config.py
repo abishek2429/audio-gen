@@ -30,6 +30,9 @@ def _is_serverless_or_readonly() -> bool:
 class Settings(BaseSettings):
     """Application and Provider settings loaded from environment variables."""
 
+    # Application Environment: 'development', 'testing', 'production', 'staging'
+    app_env: str = "development"
+
     # Active Provider: 'mock', 'soundverse', 'elevenlabs', 'stable_audio', or 'replicate'
     music_provider: Literal["mock", "soundverse", "elevenlabs", "stable_audio", "replicate"] = "mock"
 

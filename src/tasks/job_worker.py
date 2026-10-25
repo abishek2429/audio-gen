@@ -36,8 +36,99 @@ from src.tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
-# In-process worker thread pool for test and local execution
-_executor = ThreadPoolExecutor(max_workers=4)
+import threading
+from concurrent.futures import Future, wait as futures_wait
+
+
+class JobWorkerPool:
+    """Manages in-process thread pool execution with future tracking and graceful shutdown."""
+
+    def __init__(self, max_workers: int = 4):
+        self.max_workers = max_workers
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._active_futures: Dict[str, Future] = {}
+        self._lock = threading.Lock()
+        self._shutting_down = False
+
+    def submit_job(self, job_id: str) -> bool:
+        """Submit a job execution task to the thread pool."""
+        with self._lock:
+            if self._shutting_down:
+                try:
+                    logger.warning("Worker pool is shutting down; rejecting job %s", job_id)
+                except Exception:
+                    pass
+                return False
+            if getattr(self._executor, "_shutdown", False):
+                self._executor = ThreadPoolExecutor(max_workers=self.max_workers)
+            future = self._executor.submit(execute_job_pipeline, job_id)
+            self._active_futures[job_id] = future
+            future.add_done_callback(lambda f: self._cleanup_future(job_id))
+            return True
+
+    def _cleanup_future(self, job_id: str):
+        with self._lock:
+            self._active_futures.pop(job_id, None)
+
+    def active_job_count(self) -> int:
+        with self._lock:
+            return len(self._active_futures)
+
+    def wait_for_active_jobs(self, timeout: Optional[float] = 10.0) -> bool:
+        """Wait for currently active jobs to finish."""
+        with self._lock:
+            futures = list(self._active_futures.values())
+        if not futures:
+            return True
+        done, not_done = futures_wait(futures, timeout=timeout)
+        return len(not_done) == 0
+
+    def shutdown(self, wait: bool = True, timeout: Optional[float] = 10.0):
+        """Gracefully shut down the executor, waiting for active jobs."""
+        with self._lock:
+            self._shutting_down = True
+            futures = list(self._active_futures.values())
+        if wait and futures:
+            futures_wait(futures, timeout=timeout)
+        self._executor.shutdown(wait=wait)
+
+    def reset_for_testing(self):
+        """Clean shutdown and recreate pool for test fixtures."""
+        self.shutdown(wait=True, timeout=5.0)
+        with self._lock:
+            self._executor = ThreadPoolExecutor(max_workers=self.max_workers)
+            self._active_futures.clear()
+            self._shutting_down = False
+
+
+_worker_pool = JobWorkerPool(max_workers=4)
+# Maintain _executor alias for backward compatibility
+_executor = _worker_pool._executor
+
+
+def wait_for_active_jobs(timeout: Optional[float] = 10.0) -> bool:
+    """Wait for all running background worker threads to finish."""
+    return _worker_pool.wait_for_active_jobs(timeout=timeout)
+
+
+def shutdown_worker_pool(wait: bool = True, timeout: Optional[float] = 10.0):
+    """Gracefully shutdown the in-process worker pool."""
+    _worker_pool.shutdown(wait=wait, timeout=timeout)
+
+
+def ensure_worker_pool_active():
+    """Ensure the global worker pool is initialized and accepting jobs."""
+    with _worker_pool._lock:
+        if _worker_pool._shutting_down or getattr(_worker_pool._executor, "_shutdown", False):
+            _worker_pool._executor = ThreadPoolExecutor(max_workers=_worker_pool.max_workers)
+            _worker_pool._active_futures.clear()
+            _worker_pool._shutting_down = False
+
+
+def reset_worker_pool_for_testing():
+    """Reset worker pool between test modules."""
+    _worker_pool.reset_for_testing()
+
 
 
 def execute_job_pipeline(job_id: str):
@@ -393,5 +484,9 @@ def dispatch_job(job_id: str):
             logger.warning("Celery enqueue failed (%s), running via in-process executor", e)
 
     # In-process asynchronous execution
-    _executor.submit(execute_job_pipeline, job_id)
-    logger.info("Submitted job %s to in-process thread executor", job_id)
+    submitted = _worker_pool.submit_job(job_id)
+    if submitted:
+        logger.info("Submitted job %s to in-process thread executor", job_id)
+    else:
+        logger.warning("Worker pool is shutting down; job %s could not be queued", job_id)
+

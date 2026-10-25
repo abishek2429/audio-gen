@@ -16,8 +16,22 @@ def configure_test_environment():
     settings.storage_backend = "local"
     settings.local_storage_dir = "./storage_data_test"
     settings.music_provider = "mock"
-    settings.rate_limit_per_minute = 0
+    settings.app_env = "testing"
     init_db()
+
+
+@pytest.fixture(autouse=True)
+def isolate_test_state():
+    """Reset rate limiter and wait for background worker threads between tests."""
+    from src.security import global_rate_limiter
+    from src.tasks.job_worker import ensure_worker_pool_active, wait_for_active_jobs
+    ensure_worker_pool_active()
+    global_rate_limiter.reset()
+    yield
+    wait_for_active_jobs(timeout=5.0)
+    ensure_worker_pool_active()
+    global_rate_limiter.reset()
+
 
 
 

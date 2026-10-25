@@ -159,6 +159,17 @@ def get_providers_status() -> Dict[str, Any]:
     }
 
 
+def _scrub_secrets(text: str) -> str:
+    """Mask credentials, tokens, and sensitive headers from diagnostic messages."""
+    import re
+    # Mask sk-..., r8_..., or Bearer tokens
+    sanitized = re.sub(r"(sk-[a-zA-Z0-9_-]{4})[a-zA-Z0-9_-]+", r"\1...", str(text))
+    sanitized = re.sub(r"(r8_[a-zA-Z0-9_-]{4})[a-zA-Z0-9_-]+", r"\1...", sanitized)
+    sanitized = re.sub(r"(Bearer\s+)[^\s]+", r"\1[REDACTED]", sanitized, flags=re.IGNORECASE)
+    sanitized = re.sub(r"(xi-api-key['\":\s]+)[^\s,\"'}]+", r"\1[REDACTED]", sanitized, flags=re.IGNORECASE)
+    return sanitized
+
+
 @router.post(
     "/test-connection",
     response_model=ProviderTestResponse,
@@ -183,7 +194,7 @@ def test_provider_connection(payload: ProviderTestRequest) -> ProviderTestRespon
         return ProviderTestResponse(
             provider=target_provider,
             authenticated=False,
-            status="unauthenticated",
+            status="configuration_error",
             credits_balance=0.0,
             cost_per_run_usd=spec.get("cost_per_run_usd", 0.0),
             free_trial_available=spec.get("free_trial_available", False),
@@ -194,7 +205,7 @@ def test_provider_connection(payload: ProviderTestRequest) -> ProviderTestRespon
             output_formats=spec.get("output_formats", []),
             sample_generation=None,
             limitations=spec.get("limitations", []),
-            message=str(e),
+            message=_scrub_secrets(str(e)),
         )
 
     # 1. Check connection and balance
@@ -212,17 +223,35 @@ def test_provider_connection(payload: ProviderTestRequest) -> ProviderTestRespon
             msg = balance_info.get("error", "Authentication check failed.")
     except ValueError as exc:
         auth_ok = False
-        status_str = "unauthenticated"
-        msg = f"Provider credentials not configured: {exc}"
+        exc_str = str(exc)
+        is_credential_err = any(k in exc_str.lower() for k in ("api_key", "api_token", "not configured", "not set", "missing key", "credentials"))
+        if is_credential_err:
+            status_str = "unauthenticated"
+            msg = f"Provider credentials not configured: {exc}"
+        else:
+            status_str = "configuration_error"
+            msg = f"Provider configuration error: {exc}"
+    except ProviderTimeoutException as exc:
+        auth_ok = False
+        status_str = "provider_outage"
+        msg = f"Provider connection timed out: {exc}"
     except ProviderException as exc:
         auth_ok = False
-        status_str = "unauthenticated" if exc.code == "AUTHENTICATION_FAILED" else "error"
+        if exc.code == "AUTHENTICATION_FAILED":
+            status_str = "unauthenticated"
+        elif exc.code == "QUOTA_EXHAUSTED":
+            status_str = "quota_exhausted"
+        elif exc.code == "RATE_LIMIT_EXCEEDED":
+            status_str = "rate_limited"
+        elif exc.code in ("NETWORK_ERROR", "PROVIDER_TIMEOUT"):
+            status_str = "provider_outage"
+        else:
+            status_str = "error"
         msg = f"Provider verification error: {exc}"
     except Exception as exc:
         auth_ok = False
         status_str = "error"
         msg = f"Connection check encountered error: {exc}"
-
 
     sample_result: Optional[ProviderTestSampleResult] = None
 
@@ -250,9 +279,16 @@ def test_provider_connection(payload: ProviderTestRequest) -> ProviderTestRespon
                     provider_raw_metadata=gen_res.raw_metadata,
                 )
                 msg += f" Sample generation completed in {elapsed}s (output: {gen_res.duration_s}s, {len(gen_res.audio_bytes)} bytes)."
+            except ProviderTimeoutException as p_timeout:
+                status_str = "provider_outage"
+                msg += f" Sample generation timed out: {p_timeout}"
             except ProviderException as p_exc:
                 if p_exc.code == "QUOTA_EXHAUSTED":
                     status_str = "quota_exhausted"
+                elif p_exc.code == "RATE_LIMIT_EXCEEDED":
+                    status_str = "rate_limited"
+                elif p_exc.code in ("NETWORK_ERROR", "PROVIDER_TIMEOUT"):
+                    status_str = "provider_outage"
                 else:
                     status_str = "error"
                 msg += f" Sample generation failed: {p_exc}"
@@ -274,5 +310,6 @@ def test_provider_connection(payload: ProviderTestRequest) -> ProviderTestRespon
         output_formats=spec.get("output_formats", []),
         sample_generation=sample_result,
         limitations=spec.get("limitations", []),
-        message=msg,
+        message=_scrub_secrets(msg),
     )
+

@@ -135,10 +135,15 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
       const isPlayed = i / bars <= progress;
       ctx.fillStyle = isPlayed ? (color.startsWith("var") ? "#6366f1" : color) : "#232734";
       ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barHeight, 1.5);
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(x, y, barWidth, barHeight, 1.5);
+      } else {
+        ctx.rect(x, y, barWidth, barHeight);
+      }
       ctx.fill();
     }
   }, [currentTime, duration, color, title]);
+
 
   return (
     <div

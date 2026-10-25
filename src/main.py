@@ -28,12 +28,24 @@ async def lifespan(app: FastAPI):
     setup_structured_logging(settings.log_level)
     logger.info("Initializing IncuBrix AI Background Music Engine (v0.1.0)...")
     try:
+        from src.tasks.job_worker import ensure_worker_pool_active
+        ensure_worker_pool_active()
+    except Exception:
+        pass
+    try:
         init_db()
         logger.info("Database schema initialized successfully.")
     except Exception as e:
         logger.warning("Database schema initialization encountered an error (continuing startup): %s", e)
     yield
-    logger.info("IncuBrix AI Background Music Engine shutting down.")
+    logger.info("IncuBrix AI Background Music Engine shutting down: draining background jobs...")
+    try:
+        from src.tasks.job_worker import shutdown_worker_pool
+        shutdown_worker_pool(wait=True, timeout=10.0)
+    except Exception as e:
+        logger.warning("Error during worker pool shutdown: %s", e)
+    logger.info("IncuBrix AI Background Music Engine shutdown complete.")
+
 
 
 def create_app() -> FastAPI:
@@ -119,26 +131,32 @@ def create_app() -> FastAPI:
                     )
 
         # 3. Rate limiting (sliding window per client IP)
-        if settings.rate_limit_per_minute > 0 and path not in public_paths:
+        effective_limit = settings.rate_limit_per_minute
+        # Enforce production security safeguard: prevent zero/negative limits in production/staging
+        if effective_limit <= 0 and settings.app_env in ("production", "prod", "staging"):
+            effective_limit = 60
+
+        if effective_limit > 0 and path not in public_paths:
             client_ip = (
                 request.headers.get("X-Forwarded-For", request.client.host if request.client else "127.0.0.1")
                 .split(",")[0]
                 .strip()
             )
             from src.security import global_rate_limiter
-            if not global_rate_limiter.is_allowed(client_ip, limit=settings.rate_limit_per_minute):
+            if not global_rate_limiter.is_allowed(client_ip, limit=effective_limit):
                 return JSONResponse(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     content={
                         "error": {
                             "code": "RATE_LIMIT_EXCEEDED",
-                            "message": f"Rate limit of {settings.rate_limit_per_minute} requests per minute exceeded.",
+                            "message": f"Rate limit of {effective_limit} requests per minute exceeded.",
                             "retryable": True,
                             "details": {"retry_after_s": 60},
                         }
                     },
                     headers={"Retry-After": "60"},
                 )
+
 
         response = await call_next(request)
         response.headers["X-Correlation-Id"] = cid

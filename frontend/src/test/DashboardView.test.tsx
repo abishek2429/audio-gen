@@ -56,8 +56,13 @@ describe('DashboardView', () => {
     const onNavigate = vi.fn();
     render(<DashboardView onNavigate={onNavigate} />);
 
+    await waitFor(() => {
+      expect(apiClient.listJobs).toHaveBeenCalled();
+    });
+
     expect(screen.getByText('Cinematic Trailer')).toBeInTheDocument();
     expect(screen.getByText('Tech Corporate')).toBeInTheDocument();
     expect(screen.getByText('Chill Lo-Fi')).toBeInTheDocument();
   });
 });
+
