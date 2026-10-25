@@ -9,8 +9,10 @@ from typing import List, Dict, Any, Optional, Tuple
 
 try:
     import cv2
-except Exception as _cv2_err:
+    CV2_ERROR: Any = getattr(cv2, "error", Exception)
+except Exception:
     cv2 = None
+    CV2_ERROR = Exception
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -213,7 +215,7 @@ class VideoAnalyzer:
                 accent_timestamps=accents,
                 audio_present=False,  # VideoCapture does not read audio streams
             )
-        except cv2.error as cv_err:
+        except CV2_ERROR as cv_err:
             logger.error("OpenCV video decode error on %s: %s", video_path, cv_err)
             raise VideoAnalysisException(
                 "OpenCV encountered an error decoding video frames. The file may be corrupt or encoded with an unsupported codec.",
@@ -242,7 +244,7 @@ class VideoAnalyzer:
         return f"{w_ratio}:{h_ratio}"
 
     def _process_frames(
-        self, cap: cv2.VideoCapture, fps: float, total_frames: int, duration_s: float
+        self, cap: Any, fps: float, total_frames: int, duration_s: float
     ) -> Tuple[List[float], VideoActivityMetrics, List[KeyframeThumbnail], List[float]]:
         """Sample video frames to detect scene cuts, motion dynamics, visual mood, and keyframes."""
         sample_step = max(1, int(round(fps / self.sample_fps)))
