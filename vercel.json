@@ -10,11 +10,5 @@
       "maxDuration": 60,
       "excludeFiles": "{sample_audio_packs/**,artifacts/**,storage_data/**,storage_data_test/**,tests/**,test_inputs/**,docs/**,frontend/**,scripts/**,*.xlsx,*.pdf,*.db,*.sqlite3,*.log}"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index.py"
-    }
-  ]
+  }
 }
