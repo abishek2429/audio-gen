@@ -153,3 +153,31 @@ def test_stable_audio_stem_separation_dsp():
         assert stem_name in sep_res.stems
         assert len(sep_res.stems[stem_name]) > 0
     assert sep_res.raw_metadata["stems_method"] == "dsp_harmonic_decomposition"
+
+
+def test_stable_audio_rate_limit_with_retry_after(monkeypatch):
+    """Verify HTTP 429 parses Retry-After header."""
+    adapter = StableAudioAdapter(api_key="sk-test-mock-key")
+
+    def mock_post(client_self, url, **kwargs):
+        return httpx.Response(429, headers={"Retry-After": "45"}, text="Rate limit exceeded.")
+
+    monkeypatch.setattr(httpx.Client, "post", mock_post)
+
+    with pytest.raises(ProviderException) as exc_info:
+        adapter.generate_music("Test", duration_s=5.0)
+    assert exc_info.value.code == "RATE_LIMIT_EXCEEDED"
+    assert "45" in str(exc_info.value)
+
+
+def test_stable_audio_empty_audio_raises_malformed(monkeypatch):
+    """Verify empty or truncated audio bytes raises ProviderMalformedResponseException."""
+    adapter = StableAudioAdapter(api_key="sk-test-mock-key")
+
+    def mock_post(client_self, url, **kwargs):
+        return httpx.Response(200, content=b"too short")
+
+    monkeypatch.setattr(httpx.Client, "post", mock_post)
+
+    with pytest.raises(ProviderMalformedResponseException):
+        adapter.generate_music("Test", duration_s=5.0)

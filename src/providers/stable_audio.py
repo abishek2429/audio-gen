@@ -148,14 +148,21 @@ class StableAudioAdapter(AudioProviderInterface):
                     "Stability AI authentication failed: invalid API key.",
                     code="AUTHENTICATION_FAILED",
                 )
-            elif resp.status_code in (402, 403) and ("credits" in resp.text.lower() or "payment" in resp.text.lower()):
+            elif resp.status_code == 402 or (resp.status_code == 403 and any(w in resp.text.lower() for w in ("credit", "balance", "quota", "payment"))):
                 raise ProviderException(
                     "Stability AI credit quota exhausted. Please top up credits on platform.stability.ai.",
                     code="QUOTA_EXHAUSTED",
                 )
-            elif resp.status_code == 429:
+            elif resp.status_code == 403:
                 raise ProviderException(
-                    "Stability AI rate limit exceeded.",
+                    f"Stability AI forbidden / permission denied: {resp.text}",
+                    code="PERMISSION_DENIED",
+                )
+            elif resp.status_code == 429:
+                retry_after = resp.headers.get("Retry-After")
+                msg = f"Stability AI rate limit exceeded. Retry after {retry_after}s." if retry_after else "Stability AI rate limit exceeded."
+                raise ProviderException(
+                    msg,
                     code="RATE_LIMIT_EXCEEDED",
                     retryable=True,
                 )
@@ -191,6 +198,8 @@ class StableAudioAdapter(AudioProviderInterface):
                         break
                     elif poll_resp.status_code == 202:
                         continue
+                    elif poll_resp.status_code == 429:
+                        continue
                     else:
                         raise ProviderException(
                             f"Stability AI generation task {task_id} failed with HTTP {poll_resp.status_code}: {poll_resp.text}",
@@ -201,6 +210,9 @@ class StableAudioAdapter(AudioProviderInterface):
                     raise ProviderTimeoutException(f"Stability AI task {task_id} polling timed out")
             else:
                 audio_bytes = resp.content
+
+        if not audio_bytes or len(audio_bytes) < 44:
+            raise ProviderMalformedResponseException("Stability AI returned empty or truncated audio stream")
 
         elapsed = time.time() - start_time
 

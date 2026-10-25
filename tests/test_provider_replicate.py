@@ -83,3 +83,25 @@ def test_replicate_generation_lifecycle(monkeypatch):
     assert gen_res.duration_s == 5.0
     assert gen_res.audio_bytes == fake_wav
     assert gen_res.raw_metadata["license_restriction"] == "CC-BY-NC 4.0 (Non-commercial research only)"
+    assert gen_res.raw_metadata["commercial_use_approved"] is False
+
+
+def test_replicate_empty_audio_raises_malformed(monkeypatch):
+    """Verify that empty or truncated audio bytes from Replicate raises ProviderMalformedResponseException."""
+    from src.providers.base import ProviderMalformedResponseException
+
+    adapter = ReplicateMusicGenAdapter(api_token="r8_mock_token")
+
+    def mock_post(client_self, url, **kwargs):
+        return httpx.Response(201, json={"id": "pred_empty", "status": "starting"})
+
+    def mock_get(client_self, url, **kwargs):
+        if "pred_empty" in str(url):
+            return httpx.Response(200, json={"status": "succeeded", "output": "https://replicate.delivery/empty.wav"})
+        return httpx.Response(200, content=b"")
+
+    monkeypatch.setattr(httpx.Client, "post", mock_post)
+    monkeypatch.setattr(httpx.Client, "get", mock_get)
+
+    with pytest.raises(ProviderMalformedResponseException):
+        adapter.generate_music("Test", duration_s=5.0)

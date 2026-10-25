@@ -7,7 +7,10 @@ import tempfile
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple
 
-import cv2
+try:
+    import cv2
+except Exception as _cv2_err:
+    cv2 = None
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -117,6 +120,12 @@ class VideoAnalyzer:
 
     def analyze_file(self, video_path: str, original_filename: Optional[str] = None) -> VideoAnalysisResult:
         """Extract visual metadata, scenes, pacing, and representative keyframes from a video file."""
+        if cv2 is None:
+            raise VideoAnalysisException(
+                "OpenCV (cv2) is not available or failed to load in this runtime environment. Ensure opencv-python-headless is installed.",
+                code="CV2_UNAVAILABLE",
+            )
+
         if not os.path.exists(video_path):
             raise VideoAnalysisException(f"Video file not found: {video_path}", code="FILE_NOT_FOUND")
 
@@ -204,7 +213,12 @@ class VideoAnalyzer:
                 accent_timestamps=accents,
                 audio_present=False,  # VideoCapture does not read audio streams
             )
-
+        except cv2.error as cv_err:
+            logger.error("OpenCV video decode error on %s: %s", video_path, cv_err)
+            raise VideoAnalysisException(
+                "OpenCV encountered an error decoding video frames. The file may be corrupt or encoded with an unsupported codec.",
+                code="CODEC_DECODE_ERROR",
+            ) from cv_err
         finally:
             cap.release()
 

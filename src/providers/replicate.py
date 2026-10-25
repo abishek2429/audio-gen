@@ -128,7 +128,9 @@ class ReplicateMusicGenAdapter(AudioProviderInterface):
             elif resp.status_code == 402:
                 raise ProviderException("Replicate spending limit reached or billing setup required", code="QUOTA_EXHAUSTED")
             elif resp.status_code == 429:
-                raise ProviderException("Replicate rate limit exceeded", code="RATE_LIMIT_EXCEEDED", retryable=True)
+                retry_after = resp.headers.get("Retry-After")
+                msg = f"Replicate rate limit exceeded. Retry after {retry_after}s." if retry_after else "Replicate rate limit exceeded."
+                raise ProviderException(msg, code="RATE_LIMIT_EXCEEDED", retryable=True)
             elif resp.status_code not in (200, 201):
                 raise ProviderException(f"Replicate prediction failed: {resp.text}")
 
@@ -164,6 +166,9 @@ class ReplicateMusicGenAdapter(AudioProviderInterface):
 
             audio_bytes = audio_resp.content
 
+        if not audio_bytes or len(audio_bytes) < 44:
+            raise ProviderMalformedResponseException("Replicate returned empty or truncated audio file")
+
         elapsed = time.time() - start_time
         # Replicate A100 GPU compute: ~$0.0014/sec * elapsed
         cost_usd = round(elapsed * 0.0014, 4)
@@ -182,8 +187,8 @@ class ReplicateMusicGenAdapter(AudioProviderInterface):
                 "effective_prompt": effective_prompt,
                 "license_restriction": "CC-BY-NC 4.0 (Non-commercial research only)",
                 "license": "CC-BY-NC 4.0 (Non-commercial research only for model weights)",
+                "commercial_use_approved": False,
             },
-
         )
 
     def separate_stems(

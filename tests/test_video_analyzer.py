@@ -133,3 +133,31 @@ def test_video_analyzer_duration_boundary_rejection():
         analyzer.analyze_bytes(short_video, filename="too_short.mp4")
 
     assert exc_info.value.code == "DURATION_OUT_OF_BOUNDS"
+
+
+def test_video_analyzer_handles_cv2_error(monkeypatch):
+    """Verify cv2.error during decoding maps to structured CODEC_DECODE_ERROR."""
+    analyzer = VideoAnalyzer()
+    short_video = generate_test_video_bytes(duration_s=3.0, fps=24.0)
+
+    def mock_process_frames(*args, **kwargs):
+        raise cv2.error("Simulated internal OpenCV decode failure")
+
+    monkeypatch.setattr(analyzer, "_process_frames", mock_process_frames)
+
+    with pytest.raises(VideoAnalysisException) as exc_info:
+        analyzer.analyze_bytes(short_video, filename="corrupt_codec.mp4")
+
+    assert exc_info.value.code == "CODEC_DECODE_ERROR"
+
+
+def test_video_analyzer_handles_missing_cv2(monkeypatch):
+    """Verify missing cv2 library gracefully returns CV2_UNAVAILABLE."""
+    import src.video.analyzer as va
+    monkeypatch.setattr(va, "cv2", None)
+
+    analyzer = va.VideoAnalyzer()
+    with pytest.raises(va.VideoAnalysisException) as exc_info:
+        analyzer.analyze_bytes(b"dummy bytes", filename="video.mp4")
+
+    assert exc_info.value.code == "CV2_UNAVAILABLE"
